@@ -1,0 +1,251 @@
+{
+  "aic": "",
+  "active": true,
+  "lastModifiedTime": "2026-10-16T10:00:00+08:00",
+  "protocolVersion": "02.02",
+  "name": "ROS2 节点代码生成与校验智能体",
+  "description": "ROS2 教学流水线的第三环（Partner）。接收单个节点的结构化规格，生成规范的 ROS2 Python 节点代码，执行确定性 AST 规范校验并在不通过时自动修正（最多 3 轮），同时产出知识点讲解与易错避坑。可被上游编排智能体按节点清单并发调用，每次处理一个节点、返回一份自包含信封。\n\n【输入契约】调用方把单个节点规格序列化成 JSON 字符串随消息正文传入（也可走 node_spec_json 结构化变量，二者取非空者，变量优先），字段 node_name / class_name / file_name / what_to_do / publish_topics[{topic,message_type}] / subscribe_topics[{topic,message_type}]。每次调用只处理一个节点，不接收整份节点清单。也接受 text/plain 自然语言描述（调试或单点使用），此时内部先做轻量规格补全再生成；规格外层若包了一层 {\"original_request\":\"<内层为节点 JSON 字符串>\"} 也能处理。无状态：不读取上一节点的记忆，可安全并发。\n\n【输出契约】application/json，统一信封，用固定标记包裹供调用方正则提取：\n<!--ENV_START-->{\"schema_version\":\"1.0\",\"valid\":bool,\"node_name\":str,\"class_name\":str,\"file_name\":str,\"code\":str,\"passed\":bool,\"errors\":[],\"warnings\":[],\"summary\":str,\"rounds\":int,\"teaching\":str}<!--ENV_END-->\nvalid=code 是否非空；passed=AST 是否通过（rounds 为实际修正轮数，1 表示一次通过）；code 已去除 markdown 围栏、为可直接落盘的可运行 .py；teaching 为【知识点解析】【易错避坑】【练习拓展】三块，面向学生。调用方以 file_name 作为写盘文件名，可据此拼接多节点项目（# file: 由本字段提供）。\n\n【能力范围】ROS2 Python 单节点开发：发布者、订阅者、发布订阅组合、定时器、服务端、客户端、参数服务器；话题/服务/参数通信；命名规范（类名大驼峰、节点名与文件小写下划线、话题以/开头）、完整 main 函数（rclpy.init→spin→shutdown）、self.get_logger() 日志。生成后执行确定性 AST 校验（结构正确性、导入完整性、回调参数、类继承、super().__init__、话题与消息类型是否契合规格），不通过则结合 ROS2 错误集知识库定向修正至多 3 轮。\n\n【明确拒绝】① 与 ROS2 无关的通用编程问题；② C++ 代码生成（仅 Python）；③ Nav2 / MoveIt2 等高级库代码；④ 项目级规划、节点拆分与话题设计（属项目规划智能体，本智能体按给定规格忠实生成）；⑤ 需求追问与需求理解（属需求分析智能体）；⑥ 代做完整项目交付或代写论文；⑦ 涉及实机安全风险的机器人操作指导；⑧ 硬件电路设计、设备驱动开发、真机部署与实机操控（本智能体只产出并校验代码文本，绝不连接或操控任何硬件）。混合请求只保留 ROS2 代码生成/校验相关部分并说明拒绝项。\n\n【性能与并发】单节点首过（1 轮）约 8~10 秒；走满修正循环约 20~40 秒。建议调用方对每个节点超时设 90 秒、并发上限设 4（≥3 个节点宜分批派发）。",
+  "version": "1.0.0",
+  "provider": {
+    "countryCode": "CN",
+    "organization": "Personal Project",
+    "name": "Your Name",
+    "email": "you@example.com"
+  },
+  "securitySchemes": {
+    "mtls": {
+      "type": "mutualTLS",
+      "description": "智能体间 mTLS 双向认证，证书由 ACPs CA 签发"
+    }
+  },
+  "endPoints": [
+    {
+      "url": "https://YOUR_HOST:9023/rpc",
+      "transport": "JSONRPC",
+      "security": [
+        {
+          "mtls": []
+        }
+      ]
+    }
+  ],
+  "certificate": {
+    "altNames": {
+      "ip": [
+        "YOUR_HOST"
+      ]
+    },
+    "requestedValidity": 365
+  },
+  "capabilities": {
+    "streaming": false,
+    "notification": false,
+    "messageQueue": []
+  },
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/x-python",
+    "text/markdown"
+  ],
+  "skills": [
+    {
+      "id": "ros2-codegen.node-from-spec",
+      "name": "按节点规格生成代码并校验（机器接口）",
+      "description": "面向上游编排智能体的确定性代码生成接口，流水线第三环的核心技能。输入单个节点规格 JSON（node_name/class_name/file_name/what_to_do/publish_topics/subscribe_topics），内部先规格补全（推断 core_logic、extra_features，不改变已有字段、不删字段）→ 生成代码 → 确定性 AST 校验 → 不通过则结合错误集知识库定向修正（至多 3 轮）→ 生成教学讲解，最后统一封装为一个自包含信封，外层用 <!--ENV_START--> / <!--ENV_END--> 标记，调用方正则提取后 json.loads 即可拿到 code / passed / errors / teaching / file_name 等字段。一次调用只处理一个节点，无跨调用记忆，可被并发派发（建议上限 4）。字段缺失按规则补齐；若规格本身非法（非 JSON/缺关键字段）返回 valid=false 而非猜测。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "代码生成",
+        "结构化输入",
+        "结构化输出",
+        "AST校验",
+        "自动修正",
+        "机器接口",
+        "Partner",
+        "流水线第三环",
+        "无状态",
+        "并发友好",
+        "可被委派"
+      ],
+      "examples": [
+        "{\"node_name\":\"obstacle_detector_node\",\"class_name\":\"ObstacleDetectorNode\",\"file_name\":\"obstacle_detector_node.py\",\"what_to_do\":\"订阅 /scan，计算最近障碍物距离并发布\",\"publish_topics\":[{\"topic\":\"/obstacle_distance\",\"message_type\":\"std_msgs/msg/Float32\"}],\"subscribe_topics\":[{\"topic\":\"/scan\",\"message_type\":\"sensor_msgs/msg/LaserScan\"}]}",
+        "{\"node_name\":\"motion_controller_node\",\"class_name\":\"MotionControllerNode\",\"file_name\":\"motion_controller_node.py\",\"what_to_do\":\"根据障碍物距离决策并发布底盘速度\",\"publish_topics\":[{\"topic\":\"/cmd_vel\",\"message_type\":\"geometry_msgs/msg/Twist\"}],\"subscribe_topics\":[{\"topic\":\"/obstacle_distance\",\"message_type\":\"std_msgs/msg/Float32\"}]}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/x-python"
+      ]
+    },
+    {
+      "id": "ros2-codegen.single-node",
+      "name": "单节点代码生成（自然语言）",
+      "description": "面向学生与实训教师的自然语言代码生成入口。给定一句话需求（如「写一个订阅 /scan 打印最小距离的节点」「每秒打印一次的定时器节点」「带 speed 参数默认 0.5 的节点」「加法服务的服务端」），生成规范、简洁、可运行的 ROS2 Python 单节点代码，含完整 main 函数与日志，并附知识点讲解和新手易错点提醒，随后自动 AST 校验与至多 3 轮修正。与机器接口共用同一后端；上游已持有结构化规格时请改用 ros2-codegen.node-from-spec 以获得更稳定、可复现的结果。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "Python",
+        "代码生成",
+        "单节点",
+        "发布者",
+        "订阅者",
+        "服务",
+        "定时器",
+        "参数",
+        "机器人",
+        "实训教学"
+      ],
+      "examples": [
+        "帮我写一个发布 hello world 字符串到 /chatter 的 ROS2 节点",
+        "写一个订阅 /scan 激光雷达数据并打印最小距离的节点",
+        "写一个定时器节点，每秒打印一次日志",
+        "写一个带参数的节点，参数名 speed 控制前进速度，默认值 0.5",
+        "写一个加法服务的服务端，接收两个整数返回它们的和"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/markdown",
+        "text/x-python",
+        "application/json"
+      ]
+    },
+    {
+      "id": "ros2-codegen.validate-code",
+      "name": "ROS2 代码确定性校验（机器接口）",
+      "description": "对 ROS2 Python 代码执行确定性静态 AST 校验，不调用大模型、可独立于代码生成单独调用。覆盖：结构正确性（类继承 Node、super().__init__ 调用、main 函数 rclpy 生命周期完整）、导入完整性、发布者/订阅者/服务创建方式、回调函数参数签名、命名一致性（类名/节点名/话题名是否与可选 spec 一致）、消息类型与话题契约匹配、是否误用 print 而非 get_logger 等。返回机器可读结果 {passed, error_count, errors[]（含定位与原因）, warnings[], summary}。零 token 成本、同输入同输出，适合上游智能体在合并或落盘前作为质量门禁。只静态校验文本，不执行代码、不连接 ROS2 运行时、不做真机验证。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "静态检查",
+        "AST",
+        "确定性",
+        "代码门禁",
+        "质量保证",
+        "校验",
+        "机器接口",
+        "可被委派"
+      ],
+      "examples": [
+        "{\"code\":\"import rclpy\\nfrom rclpy.node import Node\\nfrom std_msgs.msg import String\\n\\nclass HelloNode(Node):\\n    def __init__(self):\\n        super().__init__('hello_node')\\n\\ndef main():\\n    rclpy.init()\\n    rclpy.spin(HelloNode())\\n    rclpy.shutdown()\",\"spec\":\"{\\\"node_name\\\":\\\"hello_node\\\",\\\"class_name\\\":\\\"HelloNode\\\"}\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "ros2-codegen.study-tutor",
+      "name": "节点教学讲解与易错避坑",
+      "description": "面向人类学习者的教学输出，随代码生成一并产出，也可被单独请求用于讲解一段已有 ROS2 代码。输出三块：【知识点解析】讲清代码涉及的 ROS2 核心概念、API 与消息类型及其作用；【易错避坑】列出 2-3 个此类代码最常见的错误、原因与规避（优先取自 ROS2 错误集知识库）；【练习拓展】给 1 个巩固用的小改造题。语气亲切、适合大学生水平，边做边学。机器接口场景下该文本随信封的 teaching 字段返回，不单独占一次调用。本技能只讲解与提示，不代替学生完成整份作业或论文。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "学习辅导",
+        "知识点讲解",
+        "易错点",
+        "练习拓展",
+        "教学",
+        "入门",
+        "实训教学"
+      ],
+      "examples": [
+        "这段订阅者代码的回调为什么要写 self 和 msg 两个参数？",
+        "解释一下这个避障节点用到的知识点，并说说新手容易踩的坑"
+      ],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "text/markdown",
+        "text/plain"
+      ]
+    }
+  ],
+  "entityMeta": {
+    "projectFamily": "ros2-learning-agent-pipeline",
+    "pipelineRole": "partner-3-code-generation",
+    "pipelineOrder": 3,
+    "stateless": true,
+    "concurrencySafe": true,
+    "oneNodePerCall": true,
+    "upstreamPartners": [
+      "ros2-planning.plan-from-spec"
+    ],
+    "rosVersion": [
+      "humble",
+      "jazzy"
+    ],
+    "language": [
+      "python"
+    ],
+    "nodeTypes": [
+      "publisher",
+      "subscriber",
+      "pub-sub",
+      "timer",
+      "service-server",
+      "service-client",
+      "parameter"
+    ],
+    "outputContract": {
+      "envelopeMarkers": [
+        "<!--ENV_START-->",
+        "<!--ENV_END-->"
+      ],
+      "envelopeFields": [
+        "schema_version",
+        "valid",
+        "node_name",
+        "class_name",
+        "file_name",
+        "code",
+        "passed",
+        "errors",
+        "warnings",
+        "summary",
+        "rounds",
+        "teaching"
+      ],
+      "codeFenceStripped": true,
+      "machineParseable": true,
+      "fileNamePurpose": "供调用方按 file_name 落盘并拼接多节点项目（# file: 由该字段提供）"
+    },
+    "validation": {
+      "deterministic": true,
+      "engine": "AST 静态检查（结构/导入/回调签名/命名一致/话题与消息类型匹配）",
+      "maxRepairRounds": 3,
+      "repairDrivenBy": "ROS2 错误集知识库检索"
+    },
+    "latencyMs": {
+      "firstPass": "8000-10000",
+      "withRepair": "20000-40000"
+    },
+    "timeoutRecommendMs": 90000,
+    "concurrencyRecommendMax": 4,
+    "externalDependencies": [
+      "ROS2 知识库检索插件（HTTP，用于规格补全参考与错误集修正）"
+    ],
+    "targetUsers": [
+      "ROS2 初学者",
+      "高职/本科实训学生",
+      "实训教师",
+      "上游编排智能体（Leader）"
+    ],
+    "intendedCallers": [
+      "ROS2 教学主控编排智能体",
+      "课程设计项目代码合入智能体",
+      "机器人技能注册与调度智能体"
+    ]
+  }
+}

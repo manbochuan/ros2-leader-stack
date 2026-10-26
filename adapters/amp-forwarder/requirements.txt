@@ -1,0 +1,2 @@
+# 纯 Python 的 Kafka 客户端，无需编译，装起来快
+kafka-python>=2.0.2

@@ -1,0 +1,430 @@
+app:
+  mode: workflow
+  name: ros项目规划
+  subMode: chat
+kind: app
+version: 0.1.0
+workflow:
+  graph:
+    edges:
+    - id: Start_tmtj-Start_tmtj-LLM_HPq6-LLM_HPq6
+      source: Start_tmtj
+      sourceHandle: Start_tmtj
+      target: LLM_HPq6
+      targetHandle: LLM_HPq6
+    - id: LLM_HPq6-LLM_HPq6-Script_NdeX-Script_NdeX
+      source: LLM_HPq6
+      sourceHandle: LLM_HPq6
+      target: Script_NdeX
+      targetHandle: Script_NdeX
+    - id: Script_NdeX-Script_NdeX-Plugin_pp04-Plugin_pp04
+      source: Script_NdeX
+      sourceHandle: Script_NdeX
+      target: Plugin_pp04
+      targetHandle: Plugin_pp04
+    - id: Script_NdeX-Script_NdeX-Output_NdLz-Output_NdLz
+      source: Script_NdeX
+      sourceHandle: Script_NdeX
+      target: Output_NdLz
+      targetHandle: Output_NdLz
+    - id: Output_NdLz-Output_NdLz-End_Ilfa-End_Ilfa
+      source: Output_NdLz
+      sourceHandle: Output_NdLz
+      target: End_Ilfa
+      targetHandle: End_Ilfa
+    - id: LLM_HPq6-LLM_HPq6-LLM_0czX-LLM_0czX
+      source: LLM_HPq6
+      sourceHandle: LLM_HPq6
+      target: LLM_0czX
+      targetHandle: LLM_0czX
+    - id: Plugin_pp04-Plugin_pp04-LLM_0czX-LLM_0czX
+      source: Plugin_pp04
+      sourceHandle: Plugin_pp04
+      target: LLM_0czX
+      targetHandle: LLM_0czX
+    - id: LLM_0czX-LLM_0czX-Output_EsxD-Output_EsxD
+      source: LLM_0czX
+      sourceHandle: LLM_0czX
+      target: Output_EsxD
+      targetHandle: Output_EsxD
+    - id: Output_EsxD-Output_EsxD-End_Ilfa-End_Ilfa
+      source: Output_EsxD
+      sourceHandle: Output_EsxD
+      target: End_Ilfa
+      targetHandle: End_Ilfa
+    nodes:
+    - id: Start_tmtj
+      type: Start
+      name: 开始
+      x: 12
+      y: 146
+      config:
+        inputParams: []
+        outputParams:
+        - key: requirement_json
+          type: String
+          desc: 需求分析 Partner 输出的信封 data 字段（完整 JSON 字符串）
+        nodeParam: {}
+    - id: End_Ilfa
+      type: End
+      name: 结束
+      x: 2832
+      y: 116
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          jsonParams: []
+          streamSwitch: true
+          outputType: text
+          processCanOutput: false
+          textTemplate: "${LLM_0czX.result}${Script_NdeX.node_list}${Script_NdeX.plan_json}"
+    - id: LLM_HPq6
+      type: LLM
+      name: 大模型1
+      x: 483
+      y: 144
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.8-flash
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              result_format: message
+            referParams:
+            - type: String
+              key: vlImageUrl
+              desc: 图片地址
+              valueFrom: refer
+            - type: String
+              key: vlVideoUrl
+              desc: 视频地址
+              valueFrom: refer
+            modelName: Qwen3.8-Flash
+            capabilities:
+            - TG
+            - VU
+            - Reasoning
+            - VU
+            - IU
+          retryConfig:
+            retryEnabled: true
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是一位 ROS2 项目架构师，负责把上游需求分析给出的功能规格 JSON，细化为可直接生成代码的节点规格\
+            \ JSON。\n\n你不做需求理解、不追问学生（追问已由上游处理）、不写教学内容（教学由学习辅导员负责）。\n\n【输入说明】\n用户消息\
+            会给出「需求分析 JSON」，来源可能是以下任一个（取非空的那段，两者都有则以 requirement_json 为准）：\n1) sys.query\
+            \ —— 调用方通过 API 的 input.prompt 传入的一段 JSON 字符串；\n2) requirement_json ——\
+            \ 开始节点自定义变量（biz_params 通路）。\n\n输入有两可能的形态，两种都要能处理：\n形态A：直接就是需求 JSON，形如\
+            \ {\"schema_version\":\"1.0\",\"project\":{...},\"modules\":[...]}\n形态\
+            B：外面还包了一层，形如 {\"original_request\":\"<内层是需求 JSON 的字符串>\"}\n处理办法：先取最内层、\
+            含 project / modules 字段的那个 JSON 对象作为需求 JSON，再做细化；\n若 original_request 的\
+            值是字符串，把它再当 JSON 解析一次。\n如果输入根本不是 JSON（只是自然语言），按最小合理假设补齐 project 与 modules，\
+            不要追问、不要报错。\n\n【你的任务】\n1. 读取 JSON 中的 project（项目信息）和 modules（功能模块清单）。\n\
+            2. 每个功能模块映射为 1 个 ROS2 节点，按命名规范生成：\n   - 节点名：小写+下划线，以 _node 结尾，如 obstacle_detector_node\n\
+            \   - 类名：大驼峰，以 Node 结尾，如 ObstacleDetectorNode\n   - 文件名：节点名 + .py\n3.\
+            \ 把模块的 inputs/outputs 细化为节点的 publish/subscribe 话题，每个话题绑定标准 ROS2 消息类型。\n\
+            \   - 避障类项目必须遵守：/obstacle_distance 用 std_msgs/msg/Float32，/cmd_vel 用 geometry_msgs/msg/Twist\n\
+            4. 话题闭环自检：每个 subscribe 话题必须有某个节点 publish 它（传感器原始数据、/cmd_vel 等外部话题除外）。\n\
+            5. 生成项目文件清单（package.xml、setup.py、setup.cfg、launch 文件、各节点 .py）。\n6. 为每个\
+            节点生成 3-5 个知识库检索关键词（逗号分隔），用于检索 ROS2 教学素材。\n7. 如果 JSON 中某些字段缺失，用合理默认值补齐，\
+            不要追问、不要报错。\n\n【命名规范】\n- 包名：小写+下划线\n- 节点名：小写+下划线，以_node结尾\n- 类名：大驼峰，以Node结\
+            尾\n- 话题名：/开头，小写+下划线\n- 消息类型：标准ROS2消息格式\n\n【避障类项目强制规范】\n入门级避障固定2个节点：\n\
+            1. obstacle_detector_node：订阅 /scan → 计算最近障碍物距离 → 发布 /obstacle_distance\
+            \ (std_msgs/msg/Float32)\n2. motion_controller_node：订阅 /obstacle_distance\
+            \ → 决策运动 → 发布 /cmd_vel (geometry_msgs/msg/Twist)\n\n【输出要求（最高优先级）】\n只输出\
+            一个 JSON 对象，禁止 markdown 围栏、禁止任何解释文字。Schema 如下：\n\n{\n  \"schema_version\"\
+            : \"1.0\",\n  \"project\": {\n    \"name_en\": \"obstacle_avoidance\"\
+            ,\n    \"name_cn\": \"避障小车\",\n    \"package_name\": \"obstacle_avoidance\"\
+            ,\n    \"difficulty\": \"入门\",\n    \"description\": \"激光雷达检测障碍物并自动避障\"\
+            \n  },\n  \"nodes\": [\n    {\n      \"node_name\": \"obstacle_detector_node\"\
+            ,\n      \"class_name\": \"ObstacleDetectorNode\",\n      \"file_name\"\
+            : \"obstacle_detector_node.py\",\n      \"function\": \"订阅激光雷达 /scan，计\
+            算最近障碍物距离并发布\",\n      \"publish_topics\": [\n        {\"topic\": \"/obstacle_distance\"\
+            , \"message_type\": \"std_msgs/msg/Float32\", \"description\": \"最近障碍物\
+            距离\"}\n      ],\n      \"subscribe_topics\": [\n        {\"topic\": \"\
+            /scan\", \"message_type\": \"sensor_msgs/msg/LaserScan\", \"description\"\
+            : \"激光雷达原始数据\"}\n      ],\n      \"core_logic\": \"2-3句话描述核心处理逻辑\",\n\
+            \      \"search_keywords\": [\"LaserScan\", \"最小距离\", \"障碍物检测\", \"std_msgs\
+            \ Float32\"]\n    },\n    {\n      \"node_name\": \"motion_controller_node\"\
+            ,\n      \"class_name\": \"MotionControllerNode\",\n      \"file_name\"\
+            : \"motion_controller_node.py\",\n      \"function\": \"根据障碍物距离决策运动速度\"\
+            ,\n      \"publish_topics\": [\n        {\"topic\": \"/cmd_vel\", \"message_type\"\
+            : \"geometry_msgs/msg/Twist\", \"description\": \"底盘速度指令\"}\n      ],\n\
+            \      \"subscribe_topics\": [\n        {\"topic\": \"/obstacle_distance\"\
+            , \"message_type\": \"std_msgs/msg/Float32\", \"description\": \"最近障碍物\
+            距离\"}\n      ],\n      \"core_logic\": \"距离低于阈值时减速并转向，否则直行\",\n      \"\
+            search_keywords\": [\"Twist\", \"cmd_vel\", \"差速控制\", \"避障逻辑\"]\n    }\n\
+            \  ],\n  \"topic_overview\": [\n    {\"topic\": \"/obstacle_distance\"\
+            , \"message_type\": \"std_msgs/msg/Float32\", \"publisher\": \"obstacle_detector_node\"\
+            , \"subscriber\": \"motion_controller_node\", \"purpose\": \"传递障碍物距离\"\
+            }\n  ],\n  \"dependencies\": [\"rclpy\", \"sensor_msgs\", \"std_msgs\"\
+            , \"geometry_msgs\"],\n  \"file_structure\": [\n    \"obstacle_avoidance/obstacle_avoidance/__init__.py\"\
+            ,\n    \"obstacle_avoidance/obstacle_avoidance/obstacle_detector_node.py\"\
+            ,\n    \"obstacle_avoidance/obstacle_avoidance/motion_controller_node.py\"\
+            ,\n    \"obstacle_avoidance/launch/project_launch.py\",\n    \"obstacle_avoidance/package.xml\"\
+            ,\n    \"obstacle_avoidance/setup.py\",\n    \"obstacle_avoidance/setup.cfg\"\
+            \n  ]\n}"
+          promptContent: "${sys.query}\n${Start_tmtj.requirement_json}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: LLM_0czX
+      type: LLM
+      name: 大模型2
+      x: 1892
+      y: 12
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.7-flash
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              enable_thinking: false
+              thinking_budget: 800
+              result_format: message
+            referParams:
+            - type: String
+              key: vlImageUrl
+              desc: 图片地址
+              valueFrom: refer
+            - type: String
+              key: vlVideoUrl
+              desc: 视频地址
+              valueFrom: refer
+            modelName: Qwen3.7-Flash
+            capabilities:
+            - TG
+            - VU
+            - Reasoning
+            - VU
+            - IU
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是一位耐心的 ROS2 学习辅导员。项目规划书已由上游负责展示，你只负责生成「学习指南」。\n\n【项目\
+            规划 JSON】\n${LLM_HPq6.result}\n\n【知识库检索结果（教学相关）】\n${Plugin_pp04.context}\n\
+            \n【你的任务】\n1. 阅读项目规划 JSON，理解这个项目做什么、有哪些节点、数据如何流动。\n2. 结合知识库检索到的教学内容，生成学\
+            习指南。\n3. 检索到的知识点、易错点要融入到指南中，不要凭空编造。\n4. 只输出「学习指南」部分，不要输出项目规划书（规划书由上游渲染\
+            并展示给用户）。\n5. 严禁把 JSON 原文直接吐给用户，必须渲染成 Markdown。\n\n【输出格式（严格遵循）】\n\n## \U0001f393\
+            \ 学习指南\n\n### 项目介绍\n一两句话介绍这个项目是做什么的。\n\n### 系统架构\n用通俗的语言解释数据流向，用箭头连接展示\
+            节点与话题：\n节点A → /话题 → 节点B → /话题 → 节点C\n\n### 涉及的知识点\n列出这个项目用到的 ROS2 知识点，\
+            每个用 1-2 句话简单解释：\n- 知识点1：简单解释\n- 知识点2：简单解释\n（结合知识库检索到的内容来写；如果检索结果为空，就按你\
+            自己的知识写，并在开头注明\"暂无检索结果\"）\n\n### 新手易错点\n列出 3-5 个做这个项目最容易踩的坑，每个包含：\n1. 错\
+            误现象（学生会看到什么报错或异常）\n2. 原因分析（为什么会出错）\n3. 怎么避免/解决\n（优先从知识库检索到的错误集中选取）\n\n\
+            ### 运行步骤\n\n```bash\n# 1. 编译\ncd ~/ros2_ws\ncolcon build --packages-select\
+            \ <package_name>\n\n# 2. source\nsource install/setup.bash\n\n# 3. 运行\n\
+            ros2 launch <package_name> project_launch.py\n```"
+          promptContent: " 【项目规划 JSON】\n${LLM_HPq6.result}\n\n【知识库检索结果（教学相关）】\n${Plugin_pp04.context}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: Output_EsxD
+      type: Output
+      name: 流程输出1
+      x: 2362
+      y: 140
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${LLM_0czX.result}"
+          streamSwitch: true
+    - id: Plugin_pp04
+      type: Plugin
+      name: 检索ROS2知识库-Plugin_pp04
+      x: 1422
+      y: 135
+      config:
+        inputParams:
+        - key: question
+          type: String
+          value: "${Script_NdeX.search_keywords}"
+          valueFrom: refer
+        - key: top_k
+          type: String
+          value: "5"
+          valueFrom: input
+        outputParams:
+        - key: context
+          type: String
+          desc: 检索到的资料原文，据此回答用户问题
+        - key: source_count
+          type: Number
+          desc: "\t命中的资料条数，为 0 表示知识库中没有相关内容"
+        nodeParam:
+          toolId: tool_40b7be3c-04a5-48b4-a663-464291e76e1e
+          tryCatchConfig:
+            strategy: noop
+            defaultValues: []
+          pluginName: ROS2知识库检索
+          retryConfig:
+            maxRetries: 3
+            retryEnabled: false
+            retryInterval: 1000
+          pluginId: 1964368276850034_85a066fae168448aa391aa2ddae65ff4
+          toolName: 检索ROS2知识库
+    - id: Script_NdeX
+      type: Script
+      name: 脚本1-节点提取
+      x: 1041
+      y: 321
+      config:
+        inputParams:
+        - key: plan_json
+          type: String
+          value: "${LLM_HPq6.result}"
+          valueFrom: refer
+        outputParams:
+        - key: node_list
+          type: String
+          desc: 带标记的节点清单 JSON（供 Leader 派发代码生成）
+        - key: plan_json
+          type: String
+          desc: 带标记的完整规划 JSON（供 Leader 渲染规划书）
+        - key: search_keywords
+          type: String
+          desc: 汇总的检索关键词（供知识库插件）
+        - key: passed
+          type: Boolean
+          desc: JSON 是否解析成功
+          properties: []
+        nodeParam:
+          scriptContent: "import json\n\n\ndef _pick(name, args, kwargs):\n    \"\"\
+            \"取入参：平台标准 params 字典 > kwargs > 位置参数字典 > 模块全局变量\"\"\"\n    p = globals().get(\"\
+            params\")\n    if isinstance(p, dict) and name in p:\n        return p[name]\n\
+            \    if name in kwargs and kwargs[name] is not None:\n        return kwargs[name]\n\
+            \    for a in args:\n        if isinstance(a, dict):\n            if name\
+            \ in a and not isinstance(a[name], dict):\n                return a[name]\n\
+            \            for holder in (\"params\", \"inputs\", \"variables\"):\n\
+            \                inner = a.get(holder)\n                if isinstance(inner,\
+            \ dict) and name in inner:\n                    return inner[name]\n \
+            \   g = globals()\n    if name in g:\n        return g[name]\n    return\
+            \ None\n\n\ndef extract_json(text):\n    if not text:\n        return\
+            \ None\n    t = str(text).strip()\n    if t.startswith(\"```\"):\n   \
+            \     parts = t.split(\"```\")\n        if len(parts) >= 3:\n        \
+            \    t = parts[1]\n        if t.lstrip()[:4].lower() == \"json\":\n  \
+            \          t = t.lstrip()[4:]\n    left, right = t.find(\"{\"), t.rfind(\"\
+            }\")\n    if left == -1 or right == -1 or right <= left:\n        return\
+            \ None\n    try:\n        return json.loads(t[left:right + 1])\n    except\
+            \ Exception:\n        return None\n\n\ndef _slim(n):\n    if not isinstance(n,\
+            \ dict):\n        return None\n    return {\n        \"node_name\": n.get(\"\
+            node_name\", \"\"),\n        \"class_name\": n.get(\"class_name\", \"\"\
+            ),\n        \"file_name\": n.get(\"file_name\", \"\"),\n        \"what_to_do\"\
+            : n.get(\"function\", \"\"),\n        \"publish_topics\": n.get(\"publish_topics\"\
+            , []),\n        \"subscribe_topics\": n.get(\"subscribe_topics\", [])\n\
+            \    }\n\n\nMARK_L = \"<!--NODE_LIST_START-->\"\nMARK_R = \"<!--NODE_LIST_END-->\"\
+            \nPLAN_L = \"<!--PLAN_JSON_START-->\"\nPLAN_R = \"<!--PLAN_JSON_END-->\"\
+            \n\n\ndef main(*args, **kwargs):\n    raw = _pick(\"plan_json\", args,\
+            \ kwargs) or \"\"\n    raw = raw if isinstance(raw, str) else str(raw)\n\
+            \    raw = raw.strip()\n\n    data = extract_json(raw)\n\n    if data\
+            \ is None:\n        bad = json.dumps({\"valid\": False, \"nodes\": [],\
+            \ \"error\": \"规划 JSON 解析失败\"}, ensure_ascii=False)\n        return {\n\
+            \            \"passed\": False,\n            \"node_list\": MARK_L + bad\
+            \ + MARK_R,\n            \"plan_json\": PLAN_L + bad + PLAN_R,\n     \
+            \       \"search_keywords\": \"ROS2 节点 话题 消息类型\"\n        }\n\n    nodes\
+            \ = data.get(\"nodes\", []) or []\n    slim = [s for s in (_slim(n) for\
+            \ n in nodes) if s]\n\n    kws = []\n    for n in nodes:\n        if not\
+            \ isinstance(n, dict):\n            continue\n        for k in (n.get(\"\
+            search_keywords\") or []):\n            k = str(k).strip()\n         \
+            \   if k and k not in kws:\n                kws.append(k)\n    if not\
+            \ kws:\n        for s in slim:\n            if s[\"node_name\"]:\n   \
+            \             kws.append(s[\"node_name\"])\n            for t in list(s[\"\
+            publish_topics\"]) + list(s[\"subscribe_topics\"]):\n                if\
+            \ isinstance(t, dict) and t.get(\"topic\"):\n                    kws.append(t[\"\
+            topic\"].lstrip(\"/\"))\n    keywords = \" \".join(kws[:40])\n\n    full\
+            \ = {\"valid\": True, \"plan\": data}\n\n    return {\n        \"passed\"\
+            : True,\n        \"node_list\": MARK_L + json.dumps({\"valid\": True,\
+            \ \"nodes\": slim}, ensure_ascii=False) + MARK_R,\n        \"plan_json\"\
+            : PLAN_L + json.dumps(full, ensure_ascii=False) + PLAN_R,\n        \"\
+            search_keywords\": keywords\n    }"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Output_NdLz
+      type: Output
+      name: 流程输出2
+      x: 1892
+      y: 220
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_NdeX.node_list}${Script_NdeX.plan_json}"
+          streamSwitch: false
+  globalConfig:
+    historyConfig:
+      historySwitch: true
+      historyMaxRound: 5
+    historyMaxRound: 5

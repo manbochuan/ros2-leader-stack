@@ -1,0 +1,236 @@
+{
+  "aic": "1.2.156.3088.1.BUPT.AAAAAA.BBBBBB.CCCC.DDDD",
+  "name": "ROS2 学习编排智能体",
+  "active": true,
+  "version": "1.2.0",
+  "description": "面向 ROS2 学习与开发的一站式智能体，覆盖学生最常问的四类需求：① 写代码——按一句话需求生成可运行的 ROS2 Python 节点（发布者、订阅者、定时器、服务、参数）；② 做项目——从需求分析、项目规划到代码生成，产出完整 ament_python 功能包（package.xml / setup.py / launch）与学习指南，如避障小车、巡线小车、多传感器融合；③ 学概念 / 查报错——讲清话题、服务、参数、QoS、launch、colcon 等概念，并对贴出的报错做排查定位；④ 需要跨智能体协作时——把请求拆解、分派给平台上其他智能体并汇总结果，其他领域（旅游、美食等）也会检索平台转给合适的搭档。内部由代码规则表与状态机做路由（可复现、可观测），多步骤编排不会跳步、多轮上下文不会丢失。",
+  "provider": {
+    "countryCode": "CN",
+    "organization": "Personal Project",
+    "name": "Your Name",
+    "email": "you@example.com"
+  },
+  "securitySchemes": {
+    "mtls": {
+      "type": "mutualTLS",
+      "description": "智能体间 mTLS 双向认证"
+    }
+  },
+  "endPoints": [
+    {
+      "url": "https://YOUR_HOST:8449/rpc",
+      "transport": "JSONRPC",
+      "security": [
+        {
+          "mtls": []
+        }
+      ]
+    }
+  ],
+  "certificate": {
+    "altNames": {
+      "ip": [
+        "YOUR_HOST"
+      ]
+    },
+    "requestedValidity": 365
+  },
+  "capabilities": {
+    "streaming": false,
+    "notification": false,
+    "messageQueue": []
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "text/markdown"
+  ],
+  "visibility": "public",
+  "skills": [
+    {
+      "id": "ros2-leader.codegen",
+      "name": "ROS2 代码生成（写节点：发布者/订阅者/定时器/服务/参数）",
+      "description": "当用户说「帮我写一个发布 hello 的 ROS2 节点」「写个订阅激光雷达的节点」「写一个每秒打印一次的定时器」「写个加法服务端」这类「写代码」需求时，由它生成规范、可直接运行的 ROS2 Python 单节点代码：发布者、订阅者、发布订阅组合、定时器、服务端、客户端、参数服务器；包含完整 main 函数（rclpy.init → spin → shutdown）、self.get_logger() 日志、命名规范（类名大驼峰、节点名与文件名小写下划线、话题以 / 开头），并附知识点解析与新手易错点。只做 Python，不产 C++。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "代码生成",
+        "写代码",
+        "帮我写",
+        "写一个",
+        "节点",
+        "发布者",
+        "订阅者",
+        "Publisher",
+        "Subscriber",
+        "定时器",
+        "Timer",
+        "服务",
+        "客户端",
+        "参数",
+        "Python",
+        "rclpy",
+        "std_msgs",
+        "hello",
+        "hello world",
+        "示例代码",
+        "话题通信",
+        "入门"
+      ],
+      "examples": [
+        "帮我写一个发布 hello 的 ROS 节点",
+        "写一个 ROS2 发布者节点，周期性向话题发布 hello 字符串",
+        "写个订阅 /scan 激光雷达数据并打印最近距离的节点",
+        "写一个定时器节点，每秒打印一次日志",
+        "写一个带参数的节点，参数名 speed 默认 0.5",
+        "写一个加法服务的服务端",
+        "给我一段能直接跑的 ROS2 发布者代码"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "text/markdown"
+      ]
+    },
+    {
+      "id": "ros2-leader.project",
+      "name": "ROS2 项目开发（需求分析→项目规划→代码生成，完整功能包）",
+      "description": "当用户说「帮我做一个避障小车」「做个巡线小车项目」「我要交课程设计」「帮我做一个 ROS2 项目，从需求到代码一条龙」这类「做项目」需求时，由它完成一整套：需求规格化 → 节点与话题契约规划 → 生成 ament_python 功能包骨架（package.xml / setup.py / setup.cfg / launch）→ 逐节点生成代码 → 输出规划书与学习指南。支持避障、巡线、跟随、建图、导航、机械臂等常见教学项目，可按难度与传感器约束调整；多节点、多步骤需求由它统一编排并汇总成一份可照着做的交付物。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "项目",
+        "项目开发",
+        "做一个",
+        "做个",
+        "完整项目",
+        "避障小车",
+        "循迹",
+        "巡线小车",
+        "跟随",
+        "多节点",
+        "功能包",
+        "ament_python",
+        "package.xml",
+        "setup.py",
+        "launch",
+        "colcon",
+        "话题设计",
+        "需求分析",
+        "项目规划",
+        "代码生成",
+        "课程设计",
+        "实训",
+        "一条龙",
+        "编排",
+        "多智能体协作"
+      ],
+      "examples": [
+        "帮我做一个避障小车",
+        "做个巡线小车项目，要完整的功能包",
+        "帮我做一个 ROS2 项目，从需求分析到代码生成一条龙",
+        "我要交课程设计，帮我规划一个 ROS2 项目并生成代码",
+        "这个项目需要哪些节点、哪些话题，帮我列出来并生成代码",
+        "做一个多传感器融合项目，要有激光雷达和 IMU"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "text/markdown"
+      ]
+    },
+    {
+      "id": "ros2-leader.tutor",
+      "name": "ROS2 概念讲解与报错排查（什么是话题/服务区别/跑不起来）",
+      "description": "当用户提出「什么是 ROS2 的话题」「话题和服务有什么区别」「ROS2 的 QoS 是干什么的」「我跑节点时报错了」「colcon build 失败怎么办」这类「学概念 / 查报错」需求时，由它回答：解释话题、服务、动作、参数、QoS、DDS、TF、launch、colcon 构建、功能包结构、rclpy 与 rclcpp 等概念；对贴出的报错信息做排查定位（结合 ROS2 错误集知识库），给出错误现象、原因分析、排查步骤与修法。回答面向初学者，配类比与最小示例。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "概念",
+        "概念讲解",
+        "什么是",
+        "是什么",
+        "有什么区别",
+        "区别",
+        "原理",
+        "讲解",
+        "解释",
+        "学习",
+        "入门",
+        "教学",
+        "报错",
+        "错误",
+        "报错排查",
+        "排查",
+        "调试",
+        "异常",
+        "跑不起来",
+        "colcon",
+        "QoS",
+        "DDS",
+        "TF",
+        "launch",
+        "话题",
+        "服务",
+        "参数"
+      ],
+      "examples": [
+        "什么是 ROS2 的话题",
+        "话题和服务有什么区别",
+        "ROS2 的 QoS 是干什么的",
+        "我跑节点时报错了，帮我看看",
+        "colcon build 失败，说找不到包，怎么解决",
+        "rclpy 和 rclcpp 该用哪个"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "text/markdown"
+      ]
+    },
+    {
+      "id": "ros2-leader.orchestrate",
+      "name": "跨智能体编排与调度（多智能体协作、复合需求、转给其他搭档）",
+      "description": "当单个能力型智能体完不成、或用户明确要求「多智能体协作」「多步编排」「帮我调度安排」时，由它负责拆解、分派与汇总：把请求切成几个子任务，ROS2 相关的自己做，其他领域的经平台检索转给最合适的搭档，最后合成一份完整答复；支持多轮上下文（记住项目节点清单、已生成节点、当前推进阶段）。适用于复合需求（一次要做多件事）、需要跨领域协作（例如 ROS2 代码 + 其他语言代码）、或需要多步骤串起来的任务。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "编排",
+        "路由",
+        "多智能体协作",
+        "任务调度",
+        "调度",
+        "复合需求",
+        "多步",
+        "多轮对话",
+        "任务拆分",
+        "结果汇总",
+        "跨领域",
+        "转给其他智能体"
+      ],
+      "examples": [
+        "我需要多个智能体协作编排：先帮我写一个发布 hello 的 ros 节点，再帮我写一个 java 贪吃蛇，请帮我调度安排",
+        "帮我做一个完整项目，需要需求分析、项目规划、代码生成多步编排协作完成",
+        "这个任务比较杂，需要多个智能体一起做，你来安排",
+        "推荐几个北京好吃的（转给平台上别的搭档）"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "text/markdown"
+      ]
+    }
+  ],
+  "lastModifiedTime": "2026-10-16T20:36:40+08:00",
+  "protocolVersion": "02.02"
+}

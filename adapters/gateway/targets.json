@@ -1,0 +1,28 @@
+{
+  "_说明": "搭档名 → 目标智能体。百炼那边用 POST /wf/<搭档名> 调用。",
+  "_说明2": "现在三个名字都指向同一个智能体（因为目前只注册了一个）。等你把工作流拆开、分别注册之后，只要改这里的 aic 和 endpoint 即可，网关代码不用动。",
+
+  "ros2_codegen": {
+    "aic": "1.2.156.3088.1.BUPT.AAAAAA.BBBBBB.CCCC.DDDD",
+    "endpoint": "https://YOUR_HOST:8443/rpc",
+    "skill": "ros2-assistant.single-node-generator",
+    "timeout_sec": 180,
+    "备注": "生成单个 ROS2 Python 节点代码"
+  },
+
+  "ros2_plan": {
+    "aic": "1.2.156.3088.1.BUPT.AAAAAA.BBBBBB.CCCC.DDDD",
+    "endpoint": "https://YOUR_HOST:8443/rpc",
+    "skill": "ros2-assistant.project-generator",
+    "timeout_sec": 300,
+    "备注": "生成完整项目规划书 + 学习指南"
+  },
+
+  "ros2_analyze": {
+    "aic": "1.2.156.3088.1.BUPT.AAAAAA.BBBBBB.CCCC.DDDD",
+    "endpoint": "https://YOUR_HOST:8443/rpc",
+    "skill": "ros2-assistant.mode-judgment",
+    "timeout_sec": 120,
+    "备注": "需求分析：拆功能、划业务流，输出规整 JSON"
+  }
+}

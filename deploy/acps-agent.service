@@ -1,0 +1,31 @@
+[Unit]
+Description=ACPs Partner Agent (ros2_tutor) - Wutong Interconnect Platform
+Documentation=https://wt.ioa.pub/docs.html
+After=network-online.target bailian-shim.service
+Wants=network-online.target bailian-shim.service
+
+[Service]
+Type=simple
+# 说明：MVP 阶段先用 root 跑，和手工 nohup 测试时的身份一致，减少变量。
+# 后续要加固的话：chown -R acps:acps /opt/acps-agent/acps-community
+# 然后把这里改成 User=acps / Group=acps。
+User=root
+
+WorkingDirectory=/opt/acps-agent/acps-community/demo-partner
+
+# 注意：不用 EnvironmentFile。
+# partners/main.py 会用 python-dotenv 从工作目录读取 .env。
+ExecStart=/opt/acps-agent/acps-community/demo-partner/.venv/bin/python -m partners.main ros2_tutor
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=25
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=acps-agent
+
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

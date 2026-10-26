@@ -1,0 +1,17 @@
+[Unit]
+Description=ROS2 Leader orchestrator (code-layer routing over Bailian partners)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/acps-agent/leader
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/acps-agent/leader/venv/bin/python /opt/acps-agent/leader/leader.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

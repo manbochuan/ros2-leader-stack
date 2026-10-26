@@ -1,0 +1,176 @@
+{
+  "aic": "",
+  "active": true,
+  "lastModifiedTime": "2026-10-16T10:00:00+08:00",
+  "protocolVersion": "02.02",
+  "name": "ROS2 需求分析与规格化智能体",
+  "description": "ROS2 教学流水线的第一环（Partner）。把学生模糊的自然语言需求收敛为机器可读的「功能规格 JSON」，供下游项目规划与代码生成直接消费；信息不足时不猜测，返回选择题式追问。\n\n【输入契约】① text/plain：学生原话（如「帮我做一个避障小车」）；② 上下文参数 leader_context（上游初步拆解，含学生水平 beginner/advanced 与已知约束）、history（追问后学生的补充，首轮传空字符串）——经适配层以标记块随消息传入，格式如下，适配层会将其拆为百炼 biz_params 后从正文剔除：\n\n帮我做巡线小车\n<<<BIZ_PARAMS>>>\n{\"leader_context\":\"方向：巡线；水平：beginner\",\"history\":\"\"}\n<<<END_BIZ_PARAMS>>>\n\n本智能体无状态，跨轮上下文必须由调用方每次重新注入。\n\n【输出契约】application/json，统一信封，可直接 json.loads（无 markdown 围栏、无 null 污染）：{\"valid\":bool,\"need_ask\":bool,\"ask_question\":string,\"data\":{...规格...}}。valid=true 且 need_ask=false → 取 data 交给下游；valid=true 且 need_ask=true → 把 ask_question（A/B/C 选择题）透传给学生，收到补充后带 history 重走本智能体；valid=false → 内部修复一轮仍失败，调用方应降级（原文透传或提示重试），不要重试超过 1 次。data 字段：schema_version / project{name_en,name_cn,package_name,difficulty,description} / modules[{module_name,function,inputs[{topic,message_type,description}],outputs[同前],dependencies[]}]。\n\n【能力范围】项目大类识别（避障/跟随/巡线/建图/导航/机械臂等）、平台形态与传感器标签推断、功能模块划分（按数据变换次数切模块：入门 2 / 进阶 3 / 综合 4）、模块间话题契约建议、标准消息类型推断、难度与复杂度一致性复核。内部含确定性 JSON 结构校验 + 话题闭环校验（每个内部输入话题必须有生产者，传感器/执行器话题走白名单）+ 最多 1 轮自动修复；已加固交叉校验，禁止用删除字段的方式通过校验。\n\n【明确拒绝】① 与 ROS2 无关的通用编程需求；② C++ 代码生成（仅 Python）；③ 产出节点类名/文件名/可运行代码（属下游职责）；④ 产出教学内容与学习指南（属下游职责）；⑤ 多轮闲聊或知识点答疑（请直连学习辅导智能体）；⑥ Nav2 / MoveIt2 等高级库的项目规划；⑦ 硬件电路设计、设备驱动、真机部署与实机操控。混合请求只保留 ROS2 需求分析相关部分，并说明拒绝项。\n\n【性能】首过（不触发修复）约 7~15 秒；触发修复循环约 45~55 秒。建议调用方超时设为 90 秒。",
+  "version": "1.0.0",
+  "provider": {
+    "countryCode": "CN",
+    "organization": "Personal Project",
+    "name": "Your Name",
+    "email": "you@example.com"
+  },
+  "securitySchemes": {
+    "mtls": {
+      "type": "mutualTLS",
+      "description": "智能体间 mTLS 双向认证，证书由 ACPs CA 签发"
+    }
+  },
+  "endPoints": [
+    {
+      "url": "https://YOUR_HOST:9021/rpc",
+      "transport": "JSONRPC",
+      "security": [
+        {
+          "mtls": []
+        }
+      ]
+    }
+  ],
+  "certificate": {
+    "altNames": {
+      "ip": [
+        "YOUR_HOST"
+      ]
+    },
+    "requestedValidity": 365
+  },
+  "capabilities": {
+    "streaming": false,
+    "notification": false,
+    "messageQueue": []
+  },
+  "defaultInputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "ros2-requirement.analyze",
+      "name": "需求规格化分析（机器接口）",
+      "description": "面向上游编排智能体的确定性需求收敛接口。接收学生原话 + 可选的 leader_context / history，输出统一信封 JSON，一次调用即返回「可直接消费的规格」或「必须追问的选择题」，不做多轮寒暄、不产出代码、不产出教学内容。字段缺失时按规则补齐；仅当项目大类完全无法识别、或核心功能完全无法推断时才返回 need_ask=true，其余（传感器型号、阈值参数、底盘形式）一律合理推测，避免频繁打断学生。输出恒为单个可解析 JSON 对象，无围栏；内部对结果做结构校验与话题闭环校验，不通过则自动修复 1 轮。同一输入同输出，可安全重试。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "需求分析",
+        "规格化",
+        "结构化输入",
+        "结构化输出",
+        "机器接口",
+        "Partner",
+        "流水线第一环",
+        "无状态",
+        "可被委派"
+      ],
+      "examples": [
+        "帮我做一个避障小车",
+        "{\"query\":\"做个巡线小车\",\"leader_context\":\"方向：巡线；水平：beginner；约束：只用一个摄像头\",\"history\":\"\"}",
+        "{\"query\":\"做一个多传感器融合项目，要有激光雷达和IMU\",\"leader_context\":\"方向：数据融合；水平：advanced\",\"history\":\"\"}",
+        "帮我做个项目"
+      ],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "ros2-requirement.intake",
+      "name": "需求澄清与追问引导（人机协作）",
+      "description": "面向学生与实训教师的需求澄清入口。当学生描述过于笼统时，返回一道选项式选择题（A/B/C/D，一次最多问 1 个主题），用词学生友好，不堆术语；学生补充后由调用方把补充内容放入 history 重新提交，本智能体据此产出完整规格。追问判据从严：方向一旦明确就继续推测，不因缺少次要参数而打断。与 ros2-requirement.analyze 共用同一调用入口，区别仅在于面向人类读者时会同时给出追问理由。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "需求澄清",
+        "追问引导",
+        "任务分流",
+        "学生友好",
+        "教学",
+        "选择题式提问"
+      ],
+      "examples": [
+        "我想做个 ROS2 的东西（信息不足 → 追问项目类型）",
+        "做个小车（未说明功能方向 → 追问避障/巡线/遥控/其他）",
+        "做个机械臂，难一点的（方向明确 → 不追问，直接按进阶难度出规格）"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ]
+    }
+  ],
+  "entityMeta": {
+    "projectFamily": "ros2-learning-agent-pipeline",
+    "pipelineRole": "partner-1-requirement-analysis",
+    "pipelineOrder": 1,
+    "stateless": true,
+    "contextInjection": "caller-must-replay-history-every-call",
+    "downstreamPartners": [
+      "ros2-planning.plan-from-spec"
+    ],
+    "rosVersion": [
+      "humble",
+      "jazzy"
+    ],
+    "language": [
+      "python"
+    ],
+    "outputContract": {
+      "envelopeFields": [
+        "valid",
+        "need_ask",
+        "ask_question",
+        "data"
+      ],
+      "specFields": [
+        "schema_version",
+        "project",
+        "modules"
+      ],
+      "machineParseable": true,
+      "hasMarkdownFence": false,
+      "consumerRegex": null
+    },
+    "internalValidation": {
+      "deterministic": true,
+      "checks": [
+        "JSON 可解析",
+        "必填字段存在",
+        "need_ask 为布尔",
+        "modules 非空",
+        "话题闭环（内部输入话题必须有生产者，外部话题白名单除外）",
+        "交叉校验（function 提到的话题必须声明；写了「订阅」则 inputs 不得为空，禁止删字段绕过）"
+      ],
+      "maxRepairRounds": 1,
+      "repairModelSideEffect": "修复器被明令禁止用删除字段的方式通过校验"
+    },
+    "latencyMs": {
+      "firstPass": "7000-15000",
+      "withRepair": "45000-55000"
+    },
+    "timeoutRecommendMs": 90000,
+    "externalDependencies": [
+      "ROS2 知识库检索插件（HTTP，用于错误集与 API 参考）"
+    ],
+    "targetUsers": [
+      "ROS2 初学者",
+      "高职/本科实训学生",
+      "实训教师",
+      "上游编排智能体（Leader）"
+    ],
+    "intendedCallers": [
+      "ROS2 教学主控编排智能体",
+      "课程设计项目规划调度智能体"
+    ]
+  }
+}

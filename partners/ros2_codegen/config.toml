@@ -1,0 +1,49 @@
+# ============================================================
+#  ROS2 代码生成 Partner（③）—— 运行配置
+#  端口 9023（与 acs.json 里 endPoints[].url 保持一致）
+#
+#  ★ 并发说明：③ 会被【每个节点调用一次】，所以
+#    max_concurrent_tasks 决定能同时处理几个节点。
+#    上游 Leader 侧也会限制并发（默认 4），两边对齐即可。
+#
+#  本地联调：identity_binding_enabled / tls_enabled / verify_client 改 false
+# ============================================================
+
+[app]
+identity_binding_enabled = true
+
+# ---------------- 大模型档位 ----------------
+[llm.fast]
+api_key_env = "PARTNER_LLM_FAST_API_KEY"
+base_url_env = "PARTNER_LLM_FAST_BASE_URL"
+model_env = "PARTNER_LLM_FAST_MODEL"
+max_tokens = 1024
+temperature = 0.1
+
+# default 档：指向本机 shim，最终落到百炼工作流 ③
+# ★ 要输出整份代码 + 教学说明，token 给够
+[llm.default]
+api_key_env = "PARTNER_LLM_DEFAULT_API_KEY"
+base_url_env = "PARTNER_LLM_DEFAULT_BASE_URL"
+model_env = "PARTNER_LLM_DEFAULT_MODEL"
+max_tokens = 8192
+temperature = 0.6
+
+# ---------------- 对外服务 ----------------
+[server]
+host = "0.0.0.0"
+port = 9023
+
+[server.mtls]
+tls_enabled = true
+verify_client = true
+cert_file = "server.pem"
+key_file = "server.key"
+ca_file = "trust-bundle.pem"
+
+# ---------------- 运行参数 ----------------
+[concurrency]
+max_concurrent_tasks = 4
+
+[log]
+level = "INFO"

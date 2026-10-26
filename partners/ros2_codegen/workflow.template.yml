@@ -1,0 +1,1614 @@
+app:
+  mode: workflow
+  name: ros2代码生成
+  subMode: chat
+kind: app
+version: 0.1.0
+workflow:
+  graph:
+    edges:
+    - id: Start_IFrk-Start_IFrk-LLM_3GUn-LLM_3GUn
+      source: Start_IFrk
+      sourceHandle: Start_IFrk
+      target: LLM_3GUn
+      targetHandle: LLM_3GUn
+    - id: LLM_3GUn-LLM_3GUn-Plugin_lhKK-Plugin_lhKK
+      source: LLM_3GUn
+      sourceHandle: LLM_3GUn
+      target: Plugin_lhKK
+      targetHandle: Plugin_lhKK
+    - id: Plugin_lhKK-Plugin_lhKK-LLM_Mdnl-LLM_Mdnl
+      source: Plugin_lhKK
+      sourceHandle: Plugin_lhKK
+      target: LLM_Mdnl
+      targetHandle: LLM_Mdnl
+    - id: LLM_Mdnl-LLM_Mdnl-Output_UFJP-Output_UFJP
+      source: LLM_Mdnl
+      sourceHandle: LLM_Mdnl
+      target: Output_UFJP
+      targetHandle: Output_UFJP
+    - id: Output_UFJP-Output_UFJP-Script_B9sf-Script_B9sf
+      source: Output_UFJP
+      sourceHandle: Output_UFJP
+      target: Script_B9sf
+      targetHandle: Script_B9sf
+    - id: Script_B9sf-Script_B9sf-Judge_U4pP-Judge_U4pP
+      source: Script_B9sf
+      sourceHandle: Script_B9sf
+      target: Judge_U4pP
+      targetHandle: Judge_U4pP
+    - id: Script_B9sf-Script_B9sf-Output_VfQG-Output_VfQG
+      source: Script_B9sf
+      sourceHandle: Script_B9sf
+      target: Output_VfQG
+      targetHandle: Output_VfQG
+    - id: Output_VfQG-Output_VfQG-Judge_U4pP-Judge_U4pP
+      source: Output_VfQG
+      sourceHandle: Output_VfQG
+      target: Judge_U4pP
+      targetHandle: Judge_U4pP
+    - id: Judge_U4pP-Judge_U4pP-Iterator_3aWV-Iterator_3aWV
+      source: Judge_U4pP
+      sourceHandle: Judge_U4pP
+      target: Iterator_3aWV
+      targetHandle: Iterator_3aWV
+    - id: Iterator_3aWV-Iterator_3aWV-LLM_ips1-LLM_ips1
+      source: Iterator_3aWV
+      sourceHandle: Iterator_3aWV
+      target: LLM_ips1
+      targetHandle: LLM_ips1
+    - id: LLM_ips1-LLM_ips1-Script_EnvB-Script_EnvB
+      source: LLM_ips1
+      sourceHandle: LLM_ips1
+      target: Script_EnvB
+      targetHandle: Script_EnvB
+    - id: Script_EnvB-Script_EnvB-Output_KlOn-Output_KlOn
+      source: Script_EnvB
+      sourceHandle: Script_EnvB
+      target: Output_KlOn
+      targetHandle: Output_KlOn
+    - id: Judge_U4pP-Judge_U4pP-LLM_ipDd-LLM_ipDd
+      source: Judge_U4pP
+      sourceHandle: Judge_U4pP
+      target: LLM_ipDd
+      targetHandle: LLM_ipDd
+    - id: LLM_ipDd-LLM_ipDd-Script_EnvA-Script_EnvA
+      source: LLM_ipDd
+      sourceHandle: LLM_ipDd
+      target: Script_EnvA
+      targetHandle: Script_EnvA
+    - id: Script_EnvA-Script_EnvA-Output_jI8n-Output_jI8n
+      source: Script_EnvA
+      sourceHandle: Script_EnvA
+      target: Output_jI8n
+      targetHandle: Output_jI8n
+    - id: Output_jI8n-Output_jI8n-Script_9tSI-Script_9tSI
+      source: Output_jI8n
+      sourceHandle: Output_jI8n
+      target: Script_9tSI
+      targetHandle: Script_9tSI
+    - id: Output_KlOn-Output_KlOn-Script_9tSI-Script_9tSI
+      source: Output_KlOn
+      sourceHandle: Output_KlOn
+      target: Script_9tSI
+      targetHandle: Script_9tSI
+    - id: Output_wBaB-Output_wBaB-End_TSmm-End_TSmm
+      source: Output_wBaB
+      sourceHandle: Output_wBaB
+      target: End_TSmm
+      targetHandle: End_TSmm
+    - id: Script_9tSI-Script_9tSI-Output_wBaB-Output_wBaB
+      source: Script_9tSI
+      sourceHandle: Script_9tSI
+      target: Output_wBaB
+      targetHandle: Output_wBaB
+    - id: Judge_U4pP-Judge_U4pP_xnG0-Iterator_3aWV-Iterator_3aWV
+      source: Judge_U4pP
+      sourceHandle: Judge_U4pP_xnG0
+      target: Iterator_3aWV
+      targetHandle: Iterator_3aWV
+    - id: Judge_U4pP-Judge_U4pP_default-LLM_ipDd-LLM_ipDd
+      source: Judge_U4pP
+      sourceHandle: Judge_U4pP_default
+      target: LLM_ipDd
+      targetHandle: LLM_ipDd
+    nodes:
+    - id: Start_IFrk
+      type: Start
+      name: 开始
+      x: 12
+      y: 257
+      config:
+        inputParams: []
+        outputParams:
+        - key: node_spec_json
+          type: String
+          desc: 单节点结构化 JSON（来自项目规划 Partner）
+        nodeParam: {}
+    - id: End_TSmm
+      type: End
+      name: 结束
+      x: 9034
+      y: 287
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          jsonParams: []
+          streamSwitch: true
+          outputType: text
+          textTemplate: "${Script_9tSI.envelope}"
+    - id: LLM_Mdnl
+      type: LLM
+      name: 大模型2
+      x: 1422
+      y: 269
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3-coder-flash
+            params:
+              top_p: 0.8
+              temperature: 0.5
+              result_format: message
+            referParams: []
+            modelName: Qwen3-Coder-Flash
+            capabilities:
+            - TG
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: |
+            你是一个 ROS2 学习助手，专门帮学生写最简洁的 ROS2 Python 代码。
+
+            【核心原则：最少代码，只做要求的事】
+            1. 代码越简单越好，能省就省，只实现用户要求的功能
+            2. 绝对不要加用户没提到的功能（比如参数服务器、异常处理、额外日志等）
+            3. 变量名和注释要清晰，方便学生理解
+            4. 保持 ROS2 的基本规范，但不要过度设计
+
+
+            【必须有的基本结构】
+            - 节点类继承 rclpy.node.Node
+            - __init__ 里调用 super().__init__("")
+            - 发布者/订阅者在 __init__ 里创建
+            - 有 main 函数，包含 rclpy.init(args=args)、创建节点、rclpy.spin(节点)、rclpy.shutdown()
+            - 用 self.get_logger().info() 输出关键信息（必要时才加，不要到处打日志）
+
+            【不要加的东西（除非用户明确要求）】
+            - ❌ 不要加 Apache 协议头
+            - ❌ 不要加参数声明（declare_parameter / get_parameter）
+            - ❌ 不要加异常处理 try-except
+            - ❌ 不要加无关的 import
+            - ❌ 不要加生命周期相关的东西
+            - ❌ 不要加 QoS 设置（用默认的就行）
+            - ❌ 不要加定时器（除非用户要定时功能）
+            - ❌ 不要加多余的日志
+            - 必须写 `from rclpy.node import Node`，然后 `class XxxNode(Node):`
+            - ❌ 禁止写 `rclpy.Node` —— rclpy 模块没有 Node 属性，运行会 AttributeError
+
+            【代码风格】
+            - 注释：只在关键地方加中文注释，解释为什么这么做
+            - 空行：逻辑块之间加空行，不要太密也不要太散
+
+
+            【知识库参考资料使用规则】
+            - 用户提示词里的「知识库参考资料」是从 ROS2 官方知识库检索到的原文，优先依据它写代码。
+            - 资料中出现的 API 用法、消息类型定义、代码规范，以资料为准，不要凭记忆改写。
+            - 如果资料与本次需求无关，或「知识库参考资料」为空，就忽略它，按你自己的知识正常作答。
+            - 不要大段照抄资料，只把它当作事实依据。
+          promptContent: "【知识库参考资料】\n${Plugin_lhKK.context}\n\n【结构化需求】\n${LLM_3GUn.result}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: Output_KlOn
+      type: Output
+      name: 流程输出1
+      x: 7624
+      y: 183
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_EnvB.envelope}"
+          streamSwitch: false
+    - id: LLM_3GUn
+      type: LLM
+      name: 大模型3
+      x: 482
+      y: 287
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.8-flash
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              enable_thinking: false
+              result_format: message
+            referParams: []
+            modelName: Qwen3.8-Flash
+            capabilities:
+            - Reasoning
+            - TG
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是一个 ROS2 节点需求分析员。负责分析用户的节点需求（可能是自然语言描述，也可能是项目规划里的节点信\
+            息），提取并标准化成统一的 JSON 格式，供后续代码生成使用。  \n\n\n【输入可能是以下两种情况之一】  \n情况1：自然语言描述（\
+            单节点模式），例如\"帮我写一个订阅激光雷达的节点\"  \n情况2：项目规划里的节点信息（项目模式），例如节点名、类名、话题列表等\n\n\
+            【输入模式】\n情况A（默认）：输入是项目规划给出的节点信息 JSON，字段包括\n  node_name / class_name / file_name\
+            \ / what_to_do / publish_topics / subscribe_topics。\n请把这些字段直接映射到输出 JSON\
+            \ 的对应字段（publish_topics 的 {topic,message_type} 映射为 {name,msg_type}），\n并\
+            补全输入中没有的字段：core_logic、extra_features、search_keywords。\n命名规范检查照旧执行，不改变已\
+            有字段值。\n\n情况B：如果输入是自然语言描述（兼容旧用法），按原规则从头分析生成。  \n\n\n你的任务：不管输入是什么格式，都转换成\
+            下面统一的 JSON 输出格式。  \n\n\n【输出格式】  \n{  \n \"code_type\": \"node\",  \n \"\
+            language\": \"python\",  \n \"what_to_do\": \"用一句话说明这个节点要做什么\",  \n \"\
+            node_name\": \"节点名（小写+下划线，以_node结尾）\",  \n \"class_name\": \"类名（大驼峰，以\
+            Node结尾）\",  \n \"publish_topics\": [  \n   {\"name\": \"话题名（以/开头）\", \"\
+            msg_type\": \"消息类型，如 std_msgs/msg/String\"}  \n ],  \n \"subscribe_topics\"\
+            : [  \n   {\"name\": \"话题名（以/开头）\", \"msg_type\": \"消息类型，如 sensor_msgs/msg/LaserScan\"\
+            }  \n ],  \n \"core_logic\": \"核心逻辑的简要描述（应包含节点的主要处理流程，如接收什么数据、如何处理、发布什\
+            么结果）\",  \n \"extra_features\": [\"如果节点有定时器、服务、动作等额外功能，请在此列出，例如 '定时器循环\
+            '、'服务端'；若无则留空数组\"],  \n \"search_keywords\": {  \n   \"template_keywords\"\
+            : [\"用于搜代码模板的关键词，1-3个\"],  \n   \"api_keywords\": [\"用于搜API文档的关键词，2-4个\
+            \"],  \n   \"msg_keywords\": [\"用于搜消息定义的关键词，每个消息类型一个\"],  \n   \"error_keywords\"\
+            : [\"用于搜常见错误的关键词，2-3个\"]  \n }  \n}  \n\n\n【提取原则】  \n1. 如果输入已经有明确的节点名、\
+            类名、话题名，就直接用，不要改  \n2. 如果输入是自然语言，就合理推断节点名、类名、话题名和消息类型  \n3. 话题的消息类型如果没明\
+            确说，就根据功能推断最常用的  \n4. 不要添加用户没要求的功能  \n\n\n【search_keywords 生成说明】  \ntemplate_keywords（\
+            搜代码模板用，1-3个）：  \n- 只有发布 → [\"发布者节点模板\", \"publisher 示例\"]  \n- 只有订阅 →\
+            \ [\"订阅者节点模板\", \"subscriber 回调示例\"]  \n- 有发有收 → [\"发布订阅组合节点模板\"]  \n\
+            - 有服务 → [\"服务端节点模板\" 或 \"客户端节点模板\"]  \n- 有定时器 → [\"定时器回调节点模板\"]  \n- 若\
+            同时有多种功能（如发布+订阅+定时器），则取最核心的组合关键词，如 [\"发布订阅组合节点模板\", \"定时器回调节点模板\"]  \n\n\
+            \napi_keywords（搜API文档用，2-4个）：  \n- \"rclpy Node 类\"  \n- \"create_publisher\
+            \ 用法\"  \n- \"create_subscription 回调\"  \n- \"create_timer 用法\"  \n- \"\
+            get_logger 日志\"  \n- 根据节点实际用到的 API 选，确保覆盖所有使用到的功能  \n\n\nmsg_keywords（\
+            搜消息类型定义用）：  \n- 每个用到的消息类型都加一个  \n- 例如 \"Twist 消息字段\"、\"LaserScan 消息结构\"\
+            、\"std_msgs Float32\"  \n\n\nerror_keywords（搜常见错误用，2-3个）：  \n- 有订阅者 →\
+            \ [\"订阅回调参数错误\", \"回调函数忘记 msg 参数\"]  \n- 有发布者 → [\"发布者类型不匹配\", \"QoS 不\
+            匹配\"]  \n- 话题相关 → [\"话题名不一致\", \"命名空间问题\"]  \n- 导入相关 → [\"导入模块错误\", \"\
+            找不到消息类型\"]  \n- 定时器 → [\"定时器回调参数错误\"]  \n- 若节点同时有多个特征，则合并以上关键词，保留最相关的\
+            2-3个  \n\n\n【命名规范检查（必须遵守）】  \n- 节点名：小写+下划线，以 _node 结尾  \n- 类名：大驼峰，以 Node\
+            \ 结尾  \n- 话题名：以 / 开头，小写+下划线  \n- 消息类型格式：xxx/xxx/msg/Xxx，如 geometry_msgs/msg/Twist\
+            \  \n\n\n只输出 JSON，不要其他内容。\n\n\n【本工作流的输入来源】\n用户提示词按顺序给出两段内容：\n第一段是 Leader\
+            \ 传入的 node_spec_json（结构化节点信息）；\n第二段是 sys.query（在百炼控制台手动调试时使用）。\n两段中非空的\
+            那一段就是本次输入。如果两段都为空，输出一个最简的默认节点 JSON。\n\n【输入可能是被包裹的 JSON】\n调用方经 API 传入的\
+            \ sys.query 有两种形态，都要能处理：\n形态A：直接就是一个单节点规格 JSON，形如 {\"node_name\":...,\"\
+            class_name\":...,\"what_to_do\":...,\"publish_topics\":[...],\"subscribe_topics\"\
+            :[...]}\n形态B：外面又包了一层，形如 {\"original_request\":\"<内层是该节点规格 JSON 的字符串>\"\
+            }。\n处理办法：取最内层、含 node_name / what_to_do 字段的那个 JSON 作为本次规格；\n若 original_request\
+            \ 的值是字符串，把它当 JSON 再解析一次。\n本智能体每次调用只处理「一个节点」的规格，不是一次处理整个项目的节点清单。"
+          promptContent: "${Start_IFrk.node_spec_json}\n${sys.query}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: Iterator_3aWV
+      type: Iterator
+      name: 循环1
+      x: 3772
+      y: 12
+      config:
+        inputParams: []
+        outputParams:
+        - key: code
+          type: Array<String>
+          value: "${LLM_wQ4V.[result]}"
+          valueFrom: refer
+        - key: final_check
+          type: Array<String>
+          value: "${Script_Y7kF.[result]}"
+          valueFrom: refer
+        nodeParam:
+          countLimit: 3
+          variableParameters:
+          - key: passed
+            valueFrom: input
+            type: Boolean
+            value: "false"
+          iteratorType: byCount
+          block:
+            nodes:
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam: {}
+              id: IteratorStart_g0xI
+              name: 循环开始
+              parentId: Iterator_3aWV
+              width: 320
+              type: IteratorStart
+              x: 32
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam: {}
+              id: IteratorEnd_u0Pr
+              name: 迭代结束
+              parentId: Iterator_3aWV
+              width: 320
+              type: IteratorEnd
+              x: 2382
+              y: 72
+            - config:
+                inputParams: []
+                outputParams:
+                - key: result
+                  type: String
+                  desc: 文本输出
+                  isSystem: true
+                nodeParam:
+                  promptContent: "${Script_B9sf.result}${LLM_Mdnl.result}"
+                  sysPromptContent: "你是一个 ROS2 学习助手。以下代码有问题，请根据错误列表修复。\n\n修复原则：\n\
+                    - 只修错误，不要借机加额外功能\n- 保持代码简洁，不要过度设计\n- 改完后代码要能跑通\n- 类名、节点名、话题名必须\
+                    跟结构化需求里的一致，不能乱改\n\n\n【原始代码】\n\n${LLM_Mdnl.result}\n\n\n【需要修复的错\
+                    误】\n\n${Script_B9sf.result}\n\n\n请输出修正后的完整代码，用 ```python 包裹。代码\
+                    后面加一句话说明改了什么。"
+                  processCanOutput: false
+                  batchEnable: false
+                  batchSize: 50
+                  concurrentSize: 5
+                  modelConfig:
+                    modelId: qwen3-coder-flash
+                    params:
+                      top_p: 0.8
+                      temperature: 0.5
+                      result_format: message
+                    referParams: []
+                    modelName: Qwen3-Coder-Flash
+                    capabilities:
+                    - TG
+                  shortMemory:
+                    enabled: false
+                    type: self
+                    round: 3
+                    param:
+                      key: historyList
+                      type: Array<String>
+                      valueFrom: refer
+                      value: "${sys.historyList}"
+                  retryConfig:
+                    retryEnabled: false
+                    maxRetries: 3
+                    retryInterval: 500
+                  tryCatchConfig:
+                    strategy: noop
+                    defaultValues:
+                    - key: result
+                      type: String
+                      desc: 文本输出
+                      isSystem: true
+                  cacheStrategy: disabled
+                  contextSwitch: false
+                  contextParam:
+                    key: historyList
+                    type: Array<String>
+                    valueFrom: refer
+                    value: "${sys.historyList}"
+              id: LLM_wQ4V
+              name: 大模型5
+              parentId: Iterator_3aWV
+              width: 320
+              type: LLM
+              x: 502
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam:
+                  output: "${LLM_wQ4V.result}${Script_Y7kF.result}${Script_Y7kF.passed}"
+                  streamSwitch: true
+              id: Output_PHqc
+              name: 流程输出3
+              parentId: Iterator_3aWV
+              width: 320
+              type: Output
+              x: 1912
+              y: 72
+            - config:
+                inputParams:
+                - key: code
+                  valueFrom: refer
+                  value: "${LLM_wQ4V.result}"
+                  type: String
+                - key: spec
+                  valueFrom: refer
+                  value: "${LLM_3GUn.result}"
+                  type: String
+                outputParams:
+                - key: result
+                  type: String
+                  desc: 输出结果
+                  properties: []
+                - key: passed
+                  type: Boolean
+                  desc: 通过结果
+                  properties: []
+                nodeParam:
+                  scriptContent: "# ROS2 代码检查器（百炼脚本节点版）\n# 契约：模块层执行 -> 平台调用 main()\
+                    \ -> 返回值即节点输出\n# 输入：code（必需） spec（可选）\n# 输出：passed / result /\
+                    \ summary / error_count / received\n#\n\nimport ast\nimport json\n\
+                    import re\n_LANGS = (\"python3\", \"python\", \"py\", \"javascript\"\
+                    , \"js\", \"typescript\", \"ts\",\n          \"bash\", \"shell\"\
+                    , \"sh\", \"json\", \"yaml\", \"yml\", \"xml\", \"html\",\n  \
+                    \        \"css\", \"cpp\", \"c\\\\+\\\\+\", \"c\", \"java\", \"\
+                    go\", \"rust\", \"sql\",\n          \"text\", \"plaintext\")\n\
+                    _LANG = re.compile(r\"[ \\t]*(\" + \"|\".join(_LANGS) + r\")[\
+                    \ \\t]*\\r?\\n?\", re.I)\n_SPECKEYS = (\"node_name\", \"class_name\"\
+                    , \"publish_topics\",\n             \"subscribe_topics\", \"code_type\"\
+                    )\n_ENVKEYS = (\"result\", \"content\", \"text\", \"output\",\
+                    \ \"data\", \"answer\",\n            \"response\", \"value\",\
+                    \ \"code\", \"generated_code\", \"fixed_code\",\n            \"\
+                    code_text\")\ndef _strip(t):\n    \"\"\"剥离 markdown 围栏。兼容 '```pythonimport\
+                    \ x'（围栏与代码粘在一起）。\n    做法：剥掉围栏后生成两个候选（去掉语言标记 / 不去掉），\n    取第一个能\
+                    通过 ast.parse 的。这样既不会把 'pythonimport' 吃掉，\n    也不会误伤真的以 'python'\
+                    \ 开头的代码。\n    \"\"\"\n    if not isinstance(t, str):\n       \
+                    \ return \"\"\n    s = t.strip()\n    if not s.startswith(\"```\"\
+                    ):\n        return s\n    b = s[3:]\n    e = b.rfind(\"```\")\n\
+                    \    if e != -1:\n        b = b[:e]\n    m = _LANG.match(b)\n\
+                    \    c1 = (b[m.end():] if m else b).strip(\"\\n\")\n    c2 = b.strip(\"\
+                    \\n\")\n    for c in (c1, c2):\n        if c.strip():\n      \
+                    \      try:\n                ast.parse(c)\n                return\
+                    \ c\n            except Exception:\n                pass\n   \
+                    \ return c1 if c1.strip() else c2\ndef _cs(n):\n    return n.value\
+                    \ if isinstance(n, ast.Constant) and isinstance(n.value, str)\
+                    \ else None\ndef _es(n):\n    if isinstance(n, ast.Name):\n  \
+                    \      return n.id\n    if isinstance(n, ast.Attribute):\n   \
+                    \     b = _es(n.value)\n        return (b + \".\" + n.attr) if\
+                    \ b else n.attr\n    return \"\"\ndef _mc(t, m):\n    for n in\
+                    \ ast.walk(t):\n        if isinstance(n, ast.Call) and isinstance(n.func,\
+                    \ ast.Attribute) \\\n                and n.func.attr == m:\n \
+                    \           yield n\ndef _co(t, base, attr):\n    for n in ast.walk(t):\n\
+                    \        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)\
+                    \ \\\n                and n.func.attr == attr:\n            if\
+                    \ _es(n.func.value).split(\".\")[-1] == base:\n              \
+                    \  yield n\ndef _lj(v):\n    if isinstance(v, (dict, list)):\n\
+                    \        return v\n    if not isinstance(v, str):\n        return\
+                    \ None\n    t = _strip(v).strip()\n    if not t:\n        return\
+                    \ None\n    try:\n        return json.loads(t)\n    except Exception:\n\
+                    \        pass\n    i, j = t.find(\"{\"), t.rfind(\"}\")\n    if\
+                    \ i != -1 and j > i:\n        try:\n            return json.loads(t[i:j\
+                    \ + 1])\n        except Exception:\n            return None\n\
+                    \    return None\ndef _nt(n):\n    if n is None:\n        return\
+                    \ \"\"\n    s = str(n).strip().strip(\"\\\"'\")\n    return (\"\
+                    /\" + s.lstrip(\"/\")) if s else \"\"\ndef _nty(t):\n    if not\
+                    \ t:\n        return \"\"\n    s = str(t).strip().strip(\"\\\"\
+                    '\").replace(\".msg.\", \"/\").replace(\".\", \"/\")\n    p =\
+                    \ [x for x in s.split(\"/\") if x and x != \"msg\"]\n    return\
+                    \ \"/\".join(p[-2:]) if len(p) >= 2 else (p[0] if p else \"\"\
+                    )\ndef _tm(a, b):\n    if not a or not b:\n        return True\n\
+                    \    if \"/\" in a and \"/\" in b:\n        return a == b\n  \
+                    \  return a.split(\"/\")[-1] == b.split(\"/\")[-1]\ndef _ct(raw):\n\
+                    \    out = []\n    if not raw:\n        return out\n    if isinstance(raw,\
+                    \ dict):\n        raw = [raw]\n    if isinstance(raw, str):\n\
+                    \        p = _lj(raw)\n        raw = p if isinstance(p, (list,\
+                    \ dict)) else \\\n            [x.strip() for x in re.split(r\"\
+                    [,，;；\\n]\", raw) if x.strip()]\n    if not isinstance(raw, list):\n\
+                    \        return out\n    for it in raw:\n        if isinstance(it,\
+                    \ str):\n            out.append({\"name\": _nt(it), \"type\":\
+                    \ \"\"})\n        elif isinstance(it, dict):\n            out.append({\"\
+                    name\": _nt(it.get(\"name\") or it.get(\"topic\") or \"\"),\n\
+                    \                        \"type\": _nty(it.get(\"type\") or it.get(\"\
+                    msg_type\") or \"\")})\n    return [x for x in out if x[\"name\"\
+                    ]]\ndef _spec(s):\n    d = _lj(s)\n    if not isinstance(d, dict):\n\
+                    \        d = {}\n    return {\"n\": str(d.get(\"node_name\") or\
+                    \ \"\").strip(),\n            \"c\": str(d.get(\"class_name\"\
+                    ) or \"\").strip(),\n            \"p\": _ct(d.get(\"publish_topics\"\
+                    )),\n            \"s\": _ct(d.get(\"subscribe_topics\"))}\ndef\
+                    \ _usable(sp):\n    return bool(sp[\"n\"] or sp[\"c\"] or sp[\"\
+                    p\"] or sp[\"s\"])\ndef check(code, spec=None):\n    E, W = [],\
+                    \ []\n    def err(i, m, l=0):\n        E.append({\"id\": i, \"\
+                    msg\": m, \"line\": l})\n    def warn(i, m, l=0):\n        W.append({\"\
+                    id\": i, \"msg\": m, \"line\": l})\n    sp = _spec(spec)\n   \
+                    \ src = _strip(code)\n    if not _usable(sp):\n        warn(\"\
+                    W201\", \"未接 spec 或解析为空，已跳过类名/节点名/话题一致性校验\", 0)\n    if not src.strip():\n\
+                    \        err(\"E000\", \"代码为空：没收到 code，或收到的内容剥离后为空\", 0)\n   \
+                    \     return E, W, sp\n    try:\n        tree = ast.parse(src)\n\
+                    \    except SyntaxError as ex:\n        err(\"E001\", \"语法错误：第\
+                    \ %s 行 —— %s\" % (ex.lineno, ex.msg), ex.lineno or 0)\n      \
+                    \  return E, W, sp\n    names, tmap = set(), {}\n    for n in\
+                    \ ast.walk(tree):\n        if isinstance(n, ast.Import):\n   \
+                    \         for a in n.names:\n                names.add(a.asname\
+                    \ or a.name.split(\".\")[0])\n        elif isinstance(n, ast.ImportFrom):\n\
+                    \            mod = n.module or \"\"\n            for a in n.names:\n\
+                    \                names.add(a.asname or a.name)\n             \
+                    \   if mod:\n                    tmap[a.asname or a.name] = _nty(mod\
+                    \ + \".\" + a.name)\n    if \"rclpy\" not in names:\n        err(\"\
+                    E107\", \"缺少 `import rclpy`（后面 rclpy.init/spin 会 NameError）\"\
+                    , 0)\n    cls, dotted_ok = [], False\n    for c in ast.walk(tree):\n\
+                    \        if not isinstance(c, ast.ClassDef):\n            continue\n\
+                    \        for b in c.bases:\n            t = _es(b)\n         \
+                    \   if t == \"Node\" or t.endswith(\".Node\"):\n             \
+                    \   cls.append(c)\n                if t.endswith(\".Node\"):\n\
+                    \                    mod = t[:-5]\n                    if mod\
+                    \ == \"rclpy.node\":\n                        dotted_ok = True\n\
+                    \                    else:\n                        err(\"E116\"\
+                    , \"基类 `%s` 不存在：Node 在 rclpy.node 里，\"\n                     \
+                    \       \"`rclpy` 本身没有 Node 属性（运行时会 AttributeError）。\"\n     \
+                    \                       \"正确写法是 `from rclpy.node import Node`\
+                    \ 然后用 `Node`\"\n                            % t, c.lineno)\n \
+                    \               break\n    if \"Node\" not in names and not dotted_ok:\n\
+                    \        err(\"E107\", \"缺少 `from rclpy.node import Node`\", 0)\n\
+                    \    if not cls:\n        err(\"E101\", \"没有找到继承自 Node 的节点类\"\
+                    , 0)\n        mc = None\n    else:\n        mc = cls[0]\n    if\
+                    \ mc is not None:\n        if sp[\"c\"] and mc.name != sp[\"c\"\
+                    ]:\n            err(\"E108\", \"类名不一致：需求 `%s` / 代码 `%s`\" % (sp[\"\
+                    c\"], mc.name), mc.lineno)\n        im = None\n        for it\
+                    \ in mc.body:\n            if isinstance(it, ast.FunctionDef)\
+                    \ and it.name == \"__init__\":\n                im = it\n    \
+                    \            break\n        if im is None:\n            err(\"\
+                    E105\", \"节点类缺少 `__init__` 方法\", mc.lineno)\n        else:\n \
+                    \           si = None\n            for call in ast.walk(im):\n\
+                    \                if isinstance(call, ast.Call) and isinstance(call.func,\
+                    \ ast.Attribute) \\\n                        and call.func.attr\
+                    \ == \"__init__\":\n                    inner = call.func.value\n\
+                    \                    if isinstance(inner, ast.Call) and isinstance(inner.func,\
+                    \ ast.Name) \\\n                            and inner.func.id\
+                    \ == \"super\":\n                        si = call\n         \
+                    \               break\n            if si is None:\n          \
+                    \      err(\"E102\", \"`__init__` 中没有调用 `super().__init__(...)`\"\
+                    , im.lineno)\n            elif si.args:\n                nn =\
+                    \ _cs(si.args[0]) or \"\"\n                if sp[\"n\"] and nn\
+                    \ and nn != sp[\"n\"]:\n                    err(\"E109\", \"节点\
+                    名不一致：需求 `%s` / 代码 `%s`\" % (sp[\"n\"], nn), si.lineno)\n    if\
+                    \ not [n for n in ast.walk(tree)\n            if isinstance(n,\
+                    \ ast.FunctionDef) and n.name == \"main\"]:\n        err(\"E103\"\
+                    , \"缺少 `main` 函数\", 0)\n    if not any(True for _ in _co(tree,\
+                    \ \"rclpy\", \"init\")):\n        err(\"E104\", \"缺少 `rclpy.init()`\"\
+                    , 0)\n    if not (any(True for _ in _co(tree, \"rclpy\", \"spin\"\
+                    )) or\n            any(True for _ in _co(tree, \"rclpy\", \"spin_once\"\
+                    ))):\n        err(\"E104\", \"缺少 `rclpy.spin()`，节点不会进入事件循环\",\
+                    \ 0)\n    if not (any(True for _ in _co(tree, \"rclpy\", \"shutdown\"\
+                    )) or\n            any(True for _ in _mc(tree, \"destroy_node\"\
+                    ))):\n        err(\"E104\", \"缺少 `rclpy.shutdown()` 或 `node.destroy_node()`\"\
+                    , 0)\n    pubs, subs = {}, {}\n    for c in _mc(tree, \"create_publisher\"\
+                    ):\n        if len(c.args) != 3:\n            err(\"E112\", \"\
+                    `create_publisher` 参数 %d 个，应为 3 个\" % len(c.args), c.lineno)\n\
+                    \        if len(c.args) > 1 and _cs(c.args[1]):\n            raw\
+                    \ = _es(c.args[0])\n            r = tmap.get(raw) or (_nty(raw)\
+                    \ if \".\" in raw else \"\")\n            pubs[_nt(_cs(c.args[1]))]\
+                    \ = {\"line\": c.lineno, \"type\": r,\n                      \
+                    \                   \"res\": bool(r), \"raw\": raw}\n    for c\
+                    \ in _mc(tree, \"create_subscription\"):\n        if len(c.args)\
+                    \ != 4:\n            err(\"E113\", \"`create_subscription` 参数\
+                    \ %d 个，应为 4 个\" % len(c.args), c.lineno)\n        if len(c.args)\
+                    \ > 1 and _cs(c.args[1]):\n            raw = _es(c.args[0])\n\
+                    \            r = tmap.get(raw) or (_nty(raw) if \".\" in raw else\
+                    \ \"\")\n            subs[_nt(_cs(c.args[1]))] = {\"line\": c.lineno,\
+                    \ \"type\": r,\n                                         \"res\"\
+                    : bool(r), \"raw\": raw}\n    for tp, info in list(pubs.items())\
+                    \ + list(subs.items()):\n        if not info[\"res\"] and info[\"\
+                    raw\"]:\n            err(\"E114\", \"话题 `%s` 的消息类型 `%s` 没有 import（\
+                    运行期 NameError）\"\n                % (tp, info[\"raw\"]), info[\"\
+                    line\"])\n    for c in _mc(tree, \"create_subscription\"):\n \
+                    \       if len(c.args) <= 2:\n            continue\n        cb\
+                    \ = c.args[2]\n        cbn = cb.attr if isinstance(cb, ast.Attribute)\
+                    \ else \\\n            (cb.id if isinstance(cb, ast.Name) else\
+                    \ None)\n        if not cbn:\n            continue\n        tg\
+                    \ = None\n        for fn in ast.walk(tree):\n            if isinstance(fn,\
+                    \ ast.FunctionDef) and fn.name == cbn:\n                tg = fn\n\
+                    \                break\n        if tg is None:\n            err(\"\
+                    E106\", \"回调函数 `%s` 未定义\" % cbn, c.lineno)\n        elif len(tg.args.args)\
+                    \ != 2:\n            err(\"E106\", \"回调 `%s` 参数 %d 个，应为 2 个 (self,\
+                    \ msg)\"\n                % (cbn, len(tg.args.args)), tg.lineno)\n\
+                    \    for w in sp[\"p\"]:\n        g = pubs.get(w[\"name\"])\n\
+                    \        if g is None:\n            err(\"E110\", \"缺少发布者：需求要求\
+                    发布 `%s`\" % w[\"name\"], 0)\n        elif g[\"res\"] and not _tm(w[\"\
+                    type\"], g[\"type\"]):\n            err(\"E115\", \"发布话题 `%s`\
+                    \ 类型不一致：需求 `%s` / 代码 `%s`\"\n                % (w[\"name\"], w[\"\
+                    type\"], g[\"type\"]), g[\"line\"])\n    for w in sp[\"s\"]:\n\
+                    \        g = subs.get(w[\"name\"])\n        if g is None:\n  \
+                    \          err(\"E111\", \"缺少订阅者：需求要求订阅 `%s`\" % w[\"name\"],\
+                    \ 0)\n        elif g[\"res\"] and not _tm(w[\"type\"], g[\"type\"\
+                    ]):\n            err(\"E115\", \"订阅话题 `%s` 类型不一致：需求 `%s` / 代码\
+                    \ `%s`\"\n                % (w[\"name\"], w[\"type\"], g[\"type\"\
+                    ]), g[\"line\"])\n    return E, W, sp\ndef _unwrap(v, d=0):\n\
+                    \    if d > 8:\n        return v\n    if isinstance(v, dict):\n\
+                    \        if any(k in v for k in _SPECKEYS):\n            return\
+                    \ v\n        for k in _ENVKEYS:\n            if k in v:\n    \
+                    \            r = _unwrap(v[k], d + 1)\n                if r not\
+                    \ in (None, \"\", {}, []):\n                    return r\n   \
+                    \     if len(v) == 1:\n            r = _unwrap(list(v.values())[0],\
+                    \ d + 1)\n            if r not in (None, \"\", {}, []):\n    \
+                    \            return r\n        return v\n    if isinstance(v,\
+                    \ list):\n        return _unwrap(v[0], d + 1) if len(v) == 1 else\
+                    \ v\n    if isinstance(v, str):\n        s = v.strip()\n     \
+                    \   if s[:1] in (\"{\", \"[\"):\n            p = _lj(s)\n    \
+                    \        if isinstance(p, (dict, list)):\n                return\
+                    \ _unwrap(p, d + 1)\n        return v\n    return v\ndef _is_code(s):\n\
+                    \    if not isinstance(s, str) or not s.strip():\n        return\
+                    \ False\n    try:\n        ast.parse(_strip(s))\n    except Exception:\n\
+                    \        return False\n    return (\"import \" in s) or (\"class\
+                    \ \" in s) or (\"def \" in s)\ndef _find_code(v, d=0):\n    if\
+                    \ d > 8:\n        return \"\"\n    if isinstance(v, str):\n  \
+                    \      return v if _is_code(v) else \"\"\n    if isinstance(v,\
+                    \ (dict, list)):\n        best = \"\"\n        for x in (v.values()\
+                    \ if isinstance(v, dict) else v):\n            s = _find_code(x,\
+                    \ d + 1)\n            if len(s) > len(best):\n               \
+                    \ best = s\n        return best\n    return \"\"\ndef _digs(o,\
+                    \ d=0):\n    \"\"\"递归产出嵌套结构里的所有 dict（用于把 code+spec 从一个包里取出来）。\"\
+                    \"\"\n    if d > 6:\n        return\n    if isinstance(o, dict):\n\
+                    \        yield o\n        for v in o.values():\n            for\
+                    \ x in _digs(v, d + 1):\n                yield x\n    elif isinstance(o,\
+                    \ list):\n        for v in o:\n            for x in _digs(v, d\
+                    \ + 1):\n                yield x\ndef main(*args, **kwargs):\n\
+                    \    \"\"\"百炼脚本节点入口。\n    平台执行流程（实测）：\n        模块层 exec 本文件  ->\
+                    \  查找 main  ->  调用  ->  返回值即节点输出\n    因此这里用 *args, **kwargs 兼容\
+                    平台可能的传参方式，\n    并同时从 globals()/locals() 里兜底取输入变量。\n    \"\"\"\n\
+                    \    import json as _json\n    import traceback as _traceback\n\
+                    \    src = {}\n    for _k, _v in kwargs.items():\n        src[_k]\
+                    \ = _v\n    for _a in args:\n        if isinstance(_a, dict):\n\
+                    \            for _k, _v in _a.items():\n                src.setdefault(_k,\
+                    \ _v)\n    try:\n        for _k, _v in globals().items():\n  \
+                    \          src.setdefault(_k, _v)\n    except Exception:\n   \
+                    \     pass\n    try:\n        for _k, _v in locals().items():\n\
+                    \            src.setdefault(_k, _v)\n    except Exception:\n \
+                    \       pass\n    def _take(names):\n        for _n in names:\n\
+                    \            _v = src.get(_n)\n            if _v is None or callable(_v):\n\
+                    \                continue\n            if isinstance(_v, (str,\
+                    \ bytes, dict, list)) and _v:\n                return _v\n   \
+                    \     return None\n    rc = _take((\"code\", \"fixed_code\", \"\
+                    generated_code\", \"code_text\", \"input\"))\n    rs = _take((\"\
+                    spec\", \"requirement\", \"req_json\", \"input_json\",\n     \
+                    \           \"requirement_json\"))\n    if rc is None or rs is\
+                    \ None:\n        for _v in list(src.values()):\n            if\
+                    \ callable(_v):\n                continue\n            _p = None\n\
+                    \            for _d in _digs(_v):\n                if isinstance(_d,\
+                    \ dict) and _d.get(\"code\") and _d.get(\"spec\"):\n         \
+                    \           _p = _d\n                    break\n            if\
+                    \ _p:\n                if rc is None:\n                    rc\
+                    \ = _p.get(\"code\")\n                if rs is None:\n       \
+                    \             rs = _p.get(\"spec\")\n                break\n \
+                    \       if rc is None or rs is None:\n            for _v in list(src.values()):\n\
+                    \                if callable(_v):\n                    continue\n\
+                    \                if rc is None:\n                    _fc = _find_code(_v)\n\
+                    \                    if _fc:\n                        rc = _fc\n\
+                    \                if rs is None:\n                    for _d in\
+                    \ _digs(_v):\n                        if isinstance(_d, dict)\
+                    \ and _usable(_spec(_d)):\n                            rs = _d\n\
+                    \                            break\n    c = _unwrap(rc) if rc\
+                    \ is not None else \"\"\n    s = _unwrap(rs) if rs is not None\
+                    \ else {}\n    if isinstance(c, bytes):\n        try:\n      \
+                    \      c = c.decode(\"utf-8\", \"replace\")\n        except Exception:\n\
+                    \            c = \"\"\n    if not isinstance(c, str):\n      \
+                    \  c = _find_code(c)\n    try:\n        E, W, sp = check(c, s)\n\
+                    \    except Exception as _fatal:\n        return {\n         \
+                    \   \"passed\": False,\n            \"result\": _json.dumps({\n\
+                    \                \"passed\": False,\n                \"summary\"\
+                    : \"检查器内部异常：%r\" % (_fatal,),\n                \"traceback\":\
+                    \ _traceback.format_exc()[-1200:],\n            }, ensure_ascii=False),\n\
+                    \            \"summary\": \"检查器内部异常：%r\" % (_fatal,),\n      \
+                    \      \"error_count\": 1,\n            \"received\": \"fatal\
+                    \ during check\",\n        }\n    passed = len(E) == 0\n    if\
+                    \ passed and not W:\n        summary = \"检查通过：结构、命名、话题一致性全部符合\"\
+                    \n    elif passed:\n        summary = \"检查通过（%d 条建议）：%s\" % (\n\
+                    \            len(W), \"；\".join(w[\"msg\"] for w in W[:3]))\n\
+                    \    else:\n        summary = \"发现 %d 个错误：%s\" % (\n         \
+                    \   len(E), \"；\".join(e[\"msg\"] for e in E[:3]))\n    try:\n\
+                    \        received = _json.dumps({\n            \"code_type\":\
+                    \ type(rc).__name__,\n            \"code_len\": len(c) if isinstance(c,\
+                    \ str) else 0,\n            \"code_head\": (c[:40] if isinstance(c,\
+                    \ str) else \"\"),\n            \"spec_type\": type(rs).__name__,\n\
+                    \            \"spec_ok\": _usable(sp),\n            \"args_n\"\
+                    : len(args),\n            \"kwargs_n\": len(kwargs),\n       \
+                    \     \"src_keys\": sorted([k for k in src.keys()\n          \
+                    \                      if not k.startswith(\"_\")])[:25],\n  \
+                    \      }, ensure_ascii=False)\n    except Exception as _e:\n \
+                    \       received = \"dbg err: %r\" % (_e,)\n    return {\n   \
+                    \     \"passed\": passed,\n        \"result\": _json.dumps({\n\
+                    \            \"passed\": passed, \"errors\": E, \"warnings\":\
+                    \ W,\n            \"summary\": summary, \"error_count\": len(E),\
+                    \ \"spec_used\": sp,\n        }, ensure_ascii=False),\n      \
+                    \  \"summary\": summary,\n        \"error_count\": len(E),\n \
+                    \       \"received\": received,\n    }"
+                  scriptType: python
+                  retryConfig:
+                    retryEnabled: false
+                    maxRetries: 3
+                    retryInterval: 500
+                  tryCatchConfig:
+                    strategy: noop
+              id: Script_Y7kF
+              name: 脚本2
+              parentId: Iterator_3aWV
+              width: 320
+              type: Script
+              x: 972
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam:
+                  inputs:
+                  - id: 51OW
+                    left:
+                      valueFrom: refer
+                      value: "${Iterator_3aWV.passed}"
+                      type: Boolean
+                    right:
+                      valueFrom: refer
+                      value: "${Script_Y7kF.passed}"
+                      type: Boolean
+              id: Variable_h2gs
+              name: 变量赋值1
+              parentId: Iterator_3aWV
+              width: 320
+              type: Variable
+              x: 1442
+              y: 72
+            edges:
+            - zIndex: 1002
+              id: IteratorStart_g0xI-IteratorStart_g0xI-LLM_wQ4V-LLM_wQ4V
+              source: IteratorStart_g0xI
+              target: LLM_wQ4V
+              sourceHandle: IteratorStart_g0xI
+              targetHandle: LLM_wQ4V
+              type: default
+            - zIndex: 1002
+              id: LLM_wQ4V-LLM_wQ4V-Script_Y7kF-Script_Y7kF
+              source: LLM_wQ4V
+              target: Script_Y7kF
+              sourceHandle: LLM_wQ4V
+              targetHandle: Script_Y7kF
+              type: default
+              data:
+                _hover: false
+            - zIndex: 1002
+              id: Script_Y7kF-Script_Y7kF-Variable_h2gs-Variable_h2gs
+              source: Script_Y7kF
+              target: Variable_h2gs
+              sourceHandle: Script_Y7kF
+              targetHandle: Variable_h2gs
+              type: default
+            - zIndex: 1002
+              id: Variable_h2gs-Variable_h2gs-Output_PHqc-Output_PHqc
+              source: Variable_h2gs
+              target: Output_PHqc
+              sourceHandle: Variable_h2gs
+              targetHandle: Output_PHqc
+              type: default
+            - zIndex: 1002
+              id: Output_PHqc-Output_PHqc-IteratorEnd_u0Pr-IteratorEnd_u0Pr
+              source: Output_PHqc
+              target: IteratorEnd_u0Pr
+              sourceHandle: Output_PHqc
+              targetHandle: IteratorEnd_u0Pr
+              type: default
+          terminations:
+          - id: sATG
+            label: 新条件组1
+            logic: and
+            conditions:
+            - left:
+                valueFrom: refer
+                type: Boolean
+                value: "${Iterator_3aWV.passed}"
+              right:
+                valueFrom: input
+                type: Boolean
+              operator: isTrue
+    - id: Judge_U4pP
+      type: Judge
+      name: 条件判断1
+      x: 3302
+      y: 251
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          branches:
+          - id: default
+            label: 默认条件
+            targetIds:
+            - LLM_ipDd
+          - id: xnG0
+            label: 新条件组1
+            logic: and
+            conditions:
+            - left:
+                valueFrom: refer
+                type: Boolean
+                value: "${Script_B9sf.passed}"
+              right:
+                valueFrom: input
+                type: Boolean
+              operator: isFalse
+            targetIds:
+            - Iterator_3aWV
+    - id: LLM_ipDd
+      type: LLM
+      name: 大模型1
+      x: 4586
+      y: 562
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.7-flash
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              enable_thinking: false
+              thinking_budget: 4000
+              result_format: message
+            referParams:
+            - type: String
+              key: vlImageUrl
+              desc: 图片地址
+              valueFrom: refer
+            - type: String
+              key: vlVideoUrl
+              desc: 视频地址
+              valueFrom: refer
+            modelName: Qwen3.7-Flash
+            capabilities:
+            - TG
+            - VU
+            - Reasoning
+            - VU
+            - IU
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是ROS2课程讲师。\n\n【节点规格】\n${LLM_3GUn.result}\n\n【待讲解ROS2代\
+            码】\n${LLM_Mdnl.result}\n\n【知识库参考资料】\n${Plugin_lhKK.context}\n\n请参考提供的知\
+            识库，输出教学内容，分为3块：\n【知识点解析】讲解代码中涉及的ROS2核心概念、API、消息类型，并说明其作用。\n【易错避坑】列出2-3个\
+            编写此类代码时常见的错误点及避免方法。\n【练习拓展】给出1个简单的修改练习题，帮助巩固理解。\n如果传入的代码为空，输出：暂无教学内容。\n\
+            \n输出内容：\n【知识点解析】\n【易错避坑】\n【练习拓展】"
+          promptContent: " 【节点规格】\n${LLM_3GUn.result}\n\n【待讲解ROS2代码】\n${LLM_Mdnl.result}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: LLM_ips1
+      type: LLM
+      name: 大模型7
+      x: 6684
+      y: 281
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: false
+            type: self
+            round: 3
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.7-flash
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              enable_thinking: false
+              thinking_budget: 4000
+              result_format: message
+            referParams:
+            - type: String
+              key: vlImageUrl
+              desc: 图片地址
+              valueFrom: refer
+            - type: String
+              key: vlVideoUrl
+              desc: 视频地址
+              valueFrom: refer
+            modelName: Qwen3.7-Flash
+            capabilities:
+            - TG
+            - VU
+            - Reasoning
+            - VU
+            - IU
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是ROS2课程讲师。\n\n【节点规格】\n${LLM_3GUn.result}\n\n【待讲解ROS2代\
+            码】\n${Iterator_3aWV.code}\n\n【知识库参考资料】\n${Plugin_lhKK.context}\n\n请参考提\
+            供的知识库，输出教学内容，分为3块：\n【知识点解析】讲解代码中涉及的ROS2核心概念、API、消息类型，并说明其作用。\n【易错避坑】列出\
+            2-3个编写此类代码时常见的错误点及避免方法。\n【练习拓展】给出1个简单的修改练习题，帮助巩固理解。\n注意：不要输出完整代码，只输出教学\
+            讲解。\n如果传入的代码为空，输出：暂无教学内容。\n\n输出内容：\n【知识点解析】\n【易错避坑】\n【练习拓展】"
+          promptContent: " \n【节点规格】\n${LLM_3GUn.result}\n\n【待讲解ROS2代码】\n${Iterator_3aWV.code}\n\
+            \n【知识库参考资料】\n${Plugin_lhKK.context}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: false
+    - id: Output_jI8n
+      type: Output
+      name: 流程输出2
+      x: 7624
+      y: 391
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_EnvA.envelope}"
+          streamSwitch: false
+    - id: Output_UFJP
+      type: Output
+      name: 流程输出4
+      x: 1892
+      y: 287
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${LLM_Mdnl.result}"
+          streamSwitch: true
+    - id: Output_VfQG
+      type: Output
+      name: 流程输出5
+      x: 2832
+      y: 281
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_B9sf.summary}"
+          streamSwitch: true
+    - id: Script_B9sf
+      type: Script
+      name: 脚本1
+      x: 2362
+      y: 257
+      config:
+        inputParams:
+        - key: code
+          type: String
+          value: "${LLM_Mdnl.result}"
+          valueFrom: refer
+        - key: spec
+          type: String
+          value: "${LLM_3GUn.result}"
+          valueFrom: refer
+        outputParams:
+        - key: passed
+          type: Boolean
+          desc: 通过结果
+          properties: []
+        - key: result
+          type: String
+          desc: 完整 JSON，给大模型5 修复时当上下文
+        - key: summary
+          type: String
+          desc: 一句话结论，可直接展示
+        nodeParam:
+          scriptContent: "# ROS2 代码检查器（百炼脚本节点版）\n# 契约：模块层执行 -> 平台调用 main() -> 返回值即\
+            节点输出\n# 输入：code（必需） spec（可选）\n# 输出：passed / result / summary / error_count\
+            \ / received\n#\n\nimport ast\nimport json\nimport re\n_LANGS = (\"python3\"\
+            , \"python\", \"py\", \"javascript\", \"js\", \"typescript\", \"ts\",\n\
+            \          \"bash\", \"shell\", \"sh\", \"json\", \"yaml\", \"yml\", \"\
+            xml\", \"html\",\n          \"css\", \"cpp\", \"c\\\\+\\\\+\", \"c\",\
+            \ \"java\", \"go\", \"rust\", \"sql\",\n          \"text\", \"plaintext\"\
+            )\n_LANG = re.compile(r\"[ \\t]*(\" + \"|\".join(_LANGS) + r\")[ \\t]*\\\
+            r?\\n?\", re.I)\n_SPECKEYS = (\"node_name\", \"class_name\", \"publish_topics\"\
+            ,\n             \"subscribe_topics\", \"code_type\")\n_ENVKEYS = (\"result\"\
+            , \"content\", \"text\", \"output\", \"data\", \"answer\",\n         \
+            \   \"response\", \"value\", \"code\", \"generated_code\", \"fixed_code\"\
+            ,\n            \"code_text\")\ndef _strip(t):\n    \"\"\"剥离 markdown 围\
+            栏。兼容 '```pythonimport x'（围栏与代码粘在一起）。\n    做法：剥掉围栏后生成两个候选（去掉语言标记 / 不去掉）\
+            ，\n    取第一个能通过 ast.parse 的。这样既不会把 'pythonimport' 吃掉，\n    也不会误伤真的以 'python'\
+            \ 开头的代码。\n    \"\"\"\n    if not isinstance(t, str):\n        return \"\
+            \"\n    s = t.strip()\n    if not s.startswith(\"```\"):\n        return\
+            \ s\n    b = s[3:]\n    e = b.rfind(\"```\")\n    if e != -1:\n      \
+            \  b = b[:e]\n    m = _LANG.match(b)\n    c1 = (b[m.end():] if m else\
+            \ b).strip(\"\\n\")\n    c2 = b.strip(\"\\n\")\n    for c in (c1, c2):\n\
+            \        if c.strip():\n            try:\n                ast.parse(c)\n\
+            \                return c\n            except Exception:\n           \
+            \     pass\n    return c1 if c1.strip() else c2\ndef _cs(n):\n    return\
+            \ n.value if isinstance(n, ast.Constant) and isinstance(n.value, str)\
+            \ else None\ndef _es(n):\n    if isinstance(n, ast.Name):\n        return\
+            \ n.id\n    if isinstance(n, ast.Attribute):\n        b = _es(n.value)\n\
+            \        return (b + \".\" + n.attr) if b else n.attr\n    return \"\"\
+            \ndef _mc(t, m):\n    for n in ast.walk(t):\n        if isinstance(n,\
+            \ ast.Call) and isinstance(n.func, ast.Attribute) \\\n               \
+            \ and n.func.attr == m:\n            yield n\ndef _co(t, base, attr):\n\
+            \    for n in ast.walk(t):\n        if isinstance(n, ast.Call) and isinstance(n.func,\
+            \ ast.Attribute) \\\n                and n.func.attr == attr:\n      \
+            \      if _es(n.func.value).split(\".\")[-1] == base:\n              \
+            \  yield n\ndef _lj(v):\n    if isinstance(v, (dict, list)):\n       \
+            \ return v\n    if not isinstance(v, str):\n        return None\n    t\
+            \ = _strip(v).strip()\n    if not t:\n        return None\n    try:\n\
+            \        return json.loads(t)\n    except Exception:\n        pass\n \
+            \   i, j = t.find(\"{\"), t.rfind(\"}\")\n    if i != -1 and j > i:\n\
+            \        try:\n            return json.loads(t[i:j + 1])\n        except\
+            \ Exception:\n            return None\n    return None\ndef _nt(n):\n\
+            \    if n is None:\n        return \"\"\n    s = str(n).strip().strip(\"\
+            \\\"'\")\n    return (\"/\" + s.lstrip(\"/\")) if s else \"\"\ndef _nty(t):\n\
+            \    if not t:\n        return \"\"\n    s = str(t).strip().strip(\"\\\
+            \"'\").replace(\".msg.\", \"/\").replace(\".\", \"/\")\n    p = [x for\
+            \ x in s.split(\"/\") if x and x != \"msg\"]\n    return \"/\".join(p[-2:])\
+            \ if len(p) >= 2 else (p[0] if p else \"\")\ndef _tm(a, b):\n    if not\
+            \ a or not b:\n        return True\n    if \"/\" in a and \"/\" in b:\n\
+            \        return a == b\n    return a.split(\"/\")[-1] == b.split(\"/\"\
+            )[-1]\ndef _ct(raw):\n    out = []\n    if not raw:\n        return out\n\
+            \    if isinstance(raw, dict):\n        raw = [raw]\n    if isinstance(raw,\
+            \ str):\n        p = _lj(raw)\n        raw = p if isinstance(p, (list,\
+            \ dict)) else \\\n            [x.strip() for x in re.split(r\"[,，;；\\\
+            n]\", raw) if x.strip()]\n    if not isinstance(raw, list):\n        return\
+            \ out\n    for it in raw:\n        if isinstance(it, str):\n         \
+            \   out.append({\"name\": _nt(it), \"type\": \"\"})\n        elif isinstance(it,\
+            \ dict):\n            out.append({\"name\": _nt(it.get(\"name\") or it.get(\"\
+            topic\") or \"\"),\n                        \"type\": _nty(it.get(\"type\"\
+            ) or it.get(\"msg_type\") or \"\")})\n    return [x for x in out if x[\"\
+            name\"]]\ndef _spec(s):\n    d = _lj(s)\n    if not isinstance(d, dict):\n\
+            \        d = {}\n    return {\"n\": str(d.get(\"node_name\") or \"\").strip(),\n\
+            \            \"c\": str(d.get(\"class_name\") or \"\").strip(),\n    \
+            \        \"p\": _ct(d.get(\"publish_topics\")),\n            \"s\": _ct(d.get(\"\
+            subscribe_topics\"))}\ndef _usable(sp):\n    return bool(sp[\"n\"] or\
+            \ sp[\"c\"] or sp[\"p\"] or sp[\"s\"])\ndef check(code, spec=None):\n\
+            \    E, W = [], []\n    def err(i, m, l=0):\n        E.append({\"id\"\
+            : i, \"msg\": m, \"line\": l})\n    def warn(i, m, l=0):\n        W.append({\"\
+            id\": i, \"msg\": m, \"line\": l})\n    sp = _spec(spec)\n    src = _strip(code)\n\
+            \    if not _usable(sp):\n        warn(\"W201\", \"未接 spec 或解析为空，已跳过类名\
+            /节点名/话题一致性校验\", 0)\n    if not src.strip():\n        err(\"E000\", \"代\
+            码为空：没收到 code，或收到的内容剥离后为空\", 0)\n        return E, W, sp\n    try:\n  \
+            \      tree = ast.parse(src)\n    except SyntaxError as ex:\n        err(\"\
+            E001\", \"语法错误：第 %s 行 —— %s\" % (ex.lineno, ex.msg), ex.lineno or 0)\n\
+            \        return E, W, sp\n    names, tmap = set(), {}\n    for n in ast.walk(tree):\n\
+            \        if isinstance(n, ast.Import):\n            for a in n.names:\n\
+            \                names.add(a.asname or a.name.split(\".\")[0])\n     \
+            \   elif isinstance(n, ast.ImportFrom):\n            mod = n.module or\
+            \ \"\"\n            for a in n.names:\n                names.add(a.asname\
+            \ or a.name)\n                if mod:\n                    tmap[a.asname\
+            \ or a.name] = _nty(mod + \".\" + a.name)\n    if \"rclpy\" not in names:\n\
+            \        err(\"E107\", \"缺少 `import rclpy`（后面 rclpy.init/spin 会 NameError）\
+            \", 0)\n    cls, dotted_ok = [], False\n    for c in ast.walk(tree):\n\
+            \        if not isinstance(c, ast.ClassDef):\n            continue\n \
+            \       for b in c.bases:\n            t = _es(b)\n            if t ==\
+            \ \"Node\" or t.endswith(\".Node\"):\n                cls.append(c)\n\
+            \                if t.endswith(\".Node\"):\n                    mod =\
+            \ t[:-5]\n                    if mod == \"rclpy.node\":\n            \
+            \            dotted_ok = True\n                    else:\n           \
+            \             err(\"E116\", \"基类 `%s` 不存在：Node 在 rclpy.node 里，\"\n   \
+            \                         \"`rclpy` 本身没有 Node 属性（运行时会 AttributeError）。\
+            \"\n                            \"正确写法是 `from rclpy.node import Node`\
+            \ 然后用 `Node`\"\n                            % t, c.lineno)\n         \
+            \       break\n    if \"Node\" not in names and not dotted_ok:\n     \
+            \   err(\"E107\", \"缺少 `from rclpy.node import Node`\", 0)\n    if not\
+            \ cls:\n        err(\"E101\", \"没有找到继承自 Node 的节点类\", 0)\n        mc =\
+            \ None\n    else:\n        mc = cls[0]\n    if mc is not None:\n     \
+            \   if sp[\"c\"] and mc.name != sp[\"c\"]:\n            err(\"E108\",\
+            \ \"类名不一致：需求 `%s` / 代码 `%s`\" % (sp[\"c\"], mc.name), mc.lineno)\n   \
+            \     im = None\n        for it in mc.body:\n            if isinstance(it,\
+            \ ast.FunctionDef) and it.name == \"__init__\":\n                im =\
+            \ it\n                break\n        if im is None:\n            err(\"\
+            E105\", \"节点类缺少 `__init__` 方法\", mc.lineno)\n        else:\n         \
+            \   si = None\n            for call in ast.walk(im):\n               \
+            \ if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute)\
+            \ \\\n                        and call.func.attr == \"__init__\":\n  \
+            \                  inner = call.func.value\n                    if isinstance(inner,\
+            \ ast.Call) and isinstance(inner.func, ast.Name) \\\n                \
+            \            and inner.func.id == \"super\":\n                       \
+            \ si = call\n                        break\n            if si is None:\n\
+            \                err(\"E102\", \"`__init__` 中没有调用 `super().__init__(...)`\"\
+            , im.lineno)\n            elif si.args:\n                nn = _cs(si.args[0])\
+            \ or \"\"\n                if sp[\"n\"] and nn and nn != sp[\"n\"]:\n\
+            \                    err(\"E109\", \"节点名不一致：需求 `%s` / 代码 `%s`\" % (sp[\"\
+            n\"], nn), si.lineno)\n    if not [n for n in ast.walk(tree)\n       \
+            \     if isinstance(n, ast.FunctionDef) and n.name == \"main\"]:\n   \
+            \     err(\"E103\", \"缺少 `main` 函数\", 0)\n    if not any(True for _ in\
+            \ _co(tree, \"rclpy\", \"init\")):\n        err(\"E104\", \"缺少 `rclpy.init()`\"\
+            , 0)\n    if not (any(True for _ in _co(tree, \"rclpy\", \"spin\")) or\n\
+            \            any(True for _ in _co(tree, \"rclpy\", \"spin_once\"))):\n\
+            \        err(\"E104\", \"缺少 `rclpy.spin()`，节点不会进入事件循环\", 0)\n    if not\
+            \ (any(True for _ in _co(tree, \"rclpy\", \"shutdown\")) or\n        \
+            \    any(True for _ in _mc(tree, \"destroy_node\"))):\n        err(\"\
+            E104\", \"缺少 `rclpy.shutdown()` 或 `node.destroy_node()`\", 0)\n    pubs,\
+            \ subs = {}, {}\n    for c in _mc(tree, \"create_publisher\"):\n     \
+            \   if len(c.args) != 3:\n            err(\"E112\", \"`create_publisher`\
+            \ 参数 %d 个，应为 3 个\" % len(c.args), c.lineno)\n        if len(c.args) >\
+            \ 1 and _cs(c.args[1]):\n            raw = _es(c.args[0])\n          \
+            \  r = tmap.get(raw) or (_nty(raw) if \".\" in raw else \"\")\n      \
+            \      pubs[_nt(_cs(c.args[1]))] = {\"line\": c.lineno, \"type\": r,\n\
+            \                                         \"res\": bool(r), \"raw\": raw}\n\
+            \    for c in _mc(tree, \"create_subscription\"):\n        if len(c.args)\
+            \ != 4:\n            err(\"E113\", \"`create_subscription` 参数 %d 个，应为\
+            \ 4 个\" % len(c.args), c.lineno)\n        if len(c.args) > 1 and _cs(c.args[1]):\n\
+            \            raw = _es(c.args[0])\n            r = tmap.get(raw) or (_nty(raw)\
+            \ if \".\" in raw else \"\")\n            subs[_nt(_cs(c.args[1]))] =\
+            \ {\"line\": c.lineno, \"type\": r,\n                                \
+            \         \"res\": bool(r), \"raw\": raw}\n    for tp, info in list(pubs.items())\
+            \ + list(subs.items()):\n        if not info[\"res\"] and info[\"raw\"\
+            ]:\n            err(\"E114\", \"话题 `%s` 的消息类型 `%s` 没有 import（运行期 NameError）\
+            \"\n                % (tp, info[\"raw\"]), info[\"line\"])\n    for c\
+            \ in _mc(tree, \"create_subscription\"):\n        if len(c.args) <= 2:\n\
+            \            continue\n        cb = c.args[2]\n        cbn = cb.attr if\
+            \ isinstance(cb, ast.Attribute) else \\\n            (cb.id if isinstance(cb,\
+            \ ast.Name) else None)\n        if not cbn:\n            continue\n  \
+            \      tg = None\n        for fn in ast.walk(tree):\n            if isinstance(fn,\
+            \ ast.FunctionDef) and fn.name == cbn:\n                tg = fn\n    \
+            \            break\n        if tg is None:\n            err(\"E106\",\
+            \ \"回调函数 `%s` 未定义\" % cbn, c.lineno)\n        elif len(tg.args.args) !=\
+            \ 2:\n            err(\"E106\", \"回调 `%s` 参数 %d 个，应为 2 个 (self, msg)\"\
+            \n                % (cbn, len(tg.args.args)), tg.lineno)\n    for w in\
+            \ sp[\"p\"]:\n        g = pubs.get(w[\"name\"])\n        if g is None:\n\
+            \            err(\"E110\", \"缺少发布者：需求要求发布 `%s`\" % w[\"name\"], 0)\n \
+            \       elif g[\"res\"] and not _tm(w[\"type\"], g[\"type\"]):\n     \
+            \       err(\"E115\", \"发布话题 `%s` 类型不一致：需求 `%s` / 代码 `%s`\"\n        \
+            \        % (w[\"name\"], w[\"type\"], g[\"type\"]), g[\"line\"])\n   \
+            \ for w in sp[\"s\"]:\n        g = subs.get(w[\"name\"])\n        if g\
+            \ is None:\n            err(\"E111\", \"缺少订阅者：需求要求订阅 `%s`\" % w[\"name\"\
+            ], 0)\n        elif g[\"res\"] and not _tm(w[\"type\"], g[\"type\"]):\n\
+            \            err(\"E115\", \"订阅话题 `%s` 类型不一致：需求 `%s` / 代码 `%s`\"\n   \
+            \             % (w[\"name\"], w[\"type\"], g[\"type\"]), g[\"line\"])\n\
+            \    return E, W, sp\ndef _unwrap(v, d=0):\n    if d > 8:\n        return\
+            \ v\n    if isinstance(v, dict):\n        if any(k in v for k in _SPECKEYS):\n\
+            \            return v\n        for k in _ENVKEYS:\n            if k in\
+            \ v:\n                r = _unwrap(v[k], d + 1)\n                if r not\
+            \ in (None, \"\", {}, []):\n                    return r\n        if len(v)\
+            \ == 1:\n            r = _unwrap(list(v.values())[0], d + 1)\n       \
+            \     if r not in (None, \"\", {}, []):\n                return r\n  \
+            \      return v\n    if isinstance(v, list):\n        return _unwrap(v[0],\
+            \ d + 1) if len(v) == 1 else v\n    if isinstance(v, str):\n        s\
+            \ = v.strip()\n        if s[:1] in (\"{\", \"[\"):\n            p = _lj(s)\n\
+            \            if isinstance(p, (dict, list)):\n                return _unwrap(p,\
+            \ d + 1)\n        return v\n    return v\ndef _is_code(s):\n    if not\
+            \ isinstance(s, str) or not s.strip():\n        return False\n    try:\n\
+            \        ast.parse(_strip(s))\n    except Exception:\n        return False\n\
+            \    return (\"import \" in s) or (\"class \" in s) or (\"def \" in s)\n\
+            def _find_code(v, d=0):\n    if d > 8:\n        return \"\"\n    if isinstance(v,\
+            \ str):\n        return v if _is_code(v) else \"\"\n    if isinstance(v,\
+            \ (dict, list)):\n        best = \"\"\n        for x in (v.values() if\
+            \ isinstance(v, dict) else v):\n            s = _find_code(x, d + 1)\n\
+            \            if len(s) > len(best):\n                best = s\n      \
+            \  return best\n    return \"\"\ndef _digs(o, d=0):\n    \"\"\"递归产出嵌套结\
+            构里的所有 dict（用于把 code+spec 从一个包里取出来）。\"\"\"\n    if d > 6:\n        return\n\
+            \    if isinstance(o, dict):\n        yield o\n        for v in o.values():\n\
+            \            for x in _digs(v, d + 1):\n                yield x\n    elif\
+            \ isinstance(o, list):\n        for v in o:\n            for x in _digs(v,\
+            \ d + 1):\n                yield x\ndef main(*args, **kwargs):\n    \"\
+            \"\"百炼脚本节点入口。\n    平台执行流程（实测）：\n        模块层 exec 本文件  ->  查找 main  ->\
+            \  调用  ->  返回值即节点输出\n    因此这里用 *args, **kwargs 兼容平台可能的传参方式，\n    并同时从\
+            \ globals()/locals() 里兜底取输入变量。\n    \"\"\"\n    import json as _json\n\
+            \    import traceback as _traceback\n    src = {}\n    for _k, _v in kwargs.items():\n\
+            \        src[_k] = _v\n    for _a in args:\n        if isinstance(_a,\
+            \ dict):\n            for _k, _v in _a.items():\n                src.setdefault(_k,\
+            \ _v)\n    try:\n        for _k, _v in globals().items():\n          \
+            \  src.setdefault(_k, _v)\n    except Exception:\n        pass\n    try:\n\
+            \        for _k, _v in locals().items():\n            src.setdefault(_k,\
+            \ _v)\n    except Exception:\n        pass\n    def _take(names):\n  \
+            \      for _n in names:\n            _v = src.get(_n)\n            if\
+            \ _v is None or callable(_v):\n                continue\n            if\
+            \ isinstance(_v, (str, bytes, dict, list)) and _v:\n                return\
+            \ _v\n        return None\n    rc = _take((\"code\", \"fixed_code\", \"\
+            generated_code\", \"code_text\", \"input\"))\n    rs = _take((\"spec\"\
+            , \"requirement\", \"req_json\", \"input_json\",\n                \"requirement_json\"\
+            ))\n    if rc is None or rs is None:\n        for _v in list(src.values()):\n\
+            \            if callable(_v):\n                continue\n            _p\
+            \ = None\n            for _d in _digs(_v):\n                if isinstance(_d,\
+            \ dict) and _d.get(\"code\") and _d.get(\"spec\"):\n                 \
+            \   _p = _d\n                    break\n            if _p:\n         \
+            \       if rc is None:\n                    rc = _p.get(\"code\")\n  \
+            \              if rs is None:\n                    rs = _p.get(\"spec\"\
+            )\n                break\n        if rc is None or rs is None:\n     \
+            \       for _v in list(src.values()):\n                if callable(_v):\n\
+            \                    continue\n                if rc is None:\n      \
+            \              _fc = _find_code(_v)\n                    if _fc:\n   \
+            \                     rc = _fc\n                if rs is None:\n     \
+            \               for _d in _digs(_v):\n                        if isinstance(_d,\
+            \ dict) and _usable(_spec(_d)):\n                            rs = _d\n\
+            \                            break\n    c = _unwrap(rc) if rc is not None\
+            \ else \"\"\n    s = _unwrap(rs) if rs is not None else {}\n    if isinstance(c,\
+            \ bytes):\n        try:\n            c = c.decode(\"utf-8\", \"replace\"\
+            )\n        except Exception:\n            c = \"\"\n    if not isinstance(c,\
+            \ str):\n        c = _find_code(c)\n    try:\n        E, W, sp = check(c,\
+            \ s)\n    except Exception as _fatal:\n        return {\n            \"\
+            passed\": False,\n            \"result\": _json.dumps({\n            \
+            \    \"passed\": False,\n                \"summary\": \"检查器内部异常：%r\" %\
+            \ (_fatal,),\n                \"traceback\": _traceback.format_exc()[-1200:],\n\
+            \            }, ensure_ascii=False),\n            \"summary\": \"检查器内部\
+            异常：%r\" % (_fatal,),\n            \"error_count\": 1,\n            \"\
+            received\": \"fatal during check\",\n        }\n    passed = len(E) ==\
+            \ 0\n    if passed and not W:\n        summary = \"检查通过：结构、命名、话题一致性全部符\
+            合\"\n    elif passed:\n        summary = \"检查通过（%d 条建议）：%s\" % (\n   \
+            \         len(W), \"；\".join(w[\"msg\"] for w in W[:3]))\n    else:\n\
+            \        summary = \"发现 %d 个错误：%s\" % (\n            len(E), \"；\".join(e[\"\
+            msg\"] for e in E[:3]))\n    try:\n        received = _json.dumps({\n\
+            \            \"code_type\": type(rc).__name__,\n            \"code_len\"\
+            : len(c) if isinstance(c, str) else 0,\n            \"code_head\": (c[:40]\
+            \ if isinstance(c, str) else \"\"),\n            \"spec_type\": type(rs).__name__,\n\
+            \            \"spec_ok\": _usable(sp),\n            \"args_n\": len(args),\n\
+            \            \"kwargs_n\": len(kwargs),\n            \"src_keys\": sorted([k\
+            \ for k in src.keys()\n                                if not k.startswith(\"\
+            _\")])[:25],\n        }, ensure_ascii=False)\n    except Exception as\
+            \ _e:\n        received = \"dbg err: %r\" % (_e,)\n    return {\n    \
+            \    \"passed\": passed,\n        \"result\": _json.dumps({\n        \
+            \    \"passed\": passed, \"errors\": E, \"warnings\": W,\n           \
+            \ \"summary\": summary, \"error_count\": len(E), \"spec_used\": sp,\n\
+            \        }, ensure_ascii=False),\n        \"summary\": summary,\n    \
+            \    \"error_count\": len(E),\n        \"received\": received,\n    }"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Plugin_lhKK
+      type: Plugin
+      name: 检索ROS2知识库-Plugin_lhKK
+      x: 952
+      y: 287
+      config:
+        inputParams:
+        - key: question
+          type: String
+          value: "${LLM_3GUn.result}"
+          valueFrom: refer
+        - key: top_k
+          type: String
+          value: "5"
+          valueFrom: input
+        outputParams:
+        - key: context
+          type: String
+          desc: 检索到的资料原文，据此回答用户问题
+        - key: source_count
+          type: Number
+          desc: "\t命中的资料条数，为 0 表示知识库中没有相关内容"
+        nodeParam:
+          toolId: tool_40b7be3c-04a5-48b4-a663-464291e76e1e
+          tryCatchConfig:
+            strategy: noop
+            defaultValues: []
+          pluginName: ROS2知识库检索
+          retryConfig:
+            maxRetries: 3
+            retryEnabled: false
+            retryInterval: 1000
+          pluginId: 1964368276850034_85a066fae168448aa391aa2ddae65ff4
+          toolName: 检索ROS2知识库
+    - id: Script_EnvA
+      type: Script
+      name: 脚本3-信封组装A(直通)
+      x: 7154
+      y: 403
+      config:
+        inputParams:
+        - key: code
+          type: String
+          value: "${LLM_Mdnl.result}"
+          valueFrom: refer
+        - key: check
+          type: String
+          value: "${Script_B9sf.result}"
+          valueFrom: refer
+        - key: teaching
+          type: String
+          value: "${LLM_ipDd.result}"
+          valueFrom: refer
+        - key: spec
+          type: String
+          value: "${LLM_3GUn.result}"
+          valueFrom: refer
+        - key: rounds
+          type: String
+          value: "1"
+          valueFrom: input
+        outputParams:
+        - key: envelope
+          type: String
+          desc: 统一信封 JSON（带 ENV 标记）
+        nodeParam:
+          scriptContent: "import json\n\n\ndef _pick(name, args, kwargs):\n    p =\
+            \ globals().get(\"params\")\n    if isinstance(p, dict) and name in p:\n\
+            \        return p[name]\n    if name in kwargs and kwargs[name] is not\
+            \ None:\n        return kwargs[name]\n    for a in args:\n        if isinstance(a,\
+            \ dict):\n            if name in a and not isinstance(a[name], dict):\n\
+            \                return a[name]\n            for holder in (\"params\"\
+            , \"inputs\", \"variables\"):\n                inner = a.get(holder)\n\
+            \                if isinstance(inner, dict) and name in inner:\n     \
+            \               return inner[name]\n    g = globals()\n    if name in\
+            \ g:\n        return g[name]\n    return None\n\n\ndef _first(x, default=None):\n\
+            \    if isinstance(x, list):\n        return x[-1] if x else default\n\
+            \    return x if x is not None else default\n\n\ndef _load(text):\n  \
+            \  if not isinstance(text, str):\n        text = json.dumps(text, ensure_ascii=False)\
+            \ if text is not None else \"\"\n    t = text.strip()\n    if t.startswith(\"\
+            ```\"):\n        parts = t.split(\"```\")\n        if len(parts) >= 3:\n\
+            \            t = parts[1]\n        if t.lstrip()[:4].lower() == \"json\"\
+            :\n            t = t.lstrip()[4:]\n    l, r = t.find(\"{\"), t.rfind(\"\
+            }\")\n    if l == -1 or r == -1:\n        return {}\n    try:\n      \
+            \  return json.loads(t[l:r + 1])\n    except Exception:\n        return\
+            \ {}\n\n\ndef _strip_fence(code):\n    if not isinstance(code, str):\n\
+            \        return \"\"\n    t = code.strip()\n    if t.startswith(\"```\"\
+            ):\n        parts = t.split(\"```\")\n        if len(parts) >= 3:\n  \
+            \          body = parts[1]\n            for lang in (\"python\", \"Python\"\
+            , \"py\"):\n                if body.lstrip().lower().startswith(lang):\n\
+            \                    body = body.lstrip()[len(lang):]\n              \
+            \      break\n            return body.strip()\n    return t\n\n\nMARK_L\
+            \ = \"<!--ENV_START-->\"\nMARK_R = \"<!--ENV_END-->\"\n\n\ndef main(*args,\
+            \ **kwargs):\n    code = _strip_fence(_first(_pick(\"code\", args, kwargs),\
+            \ \"\"))\n    check = _load(_first(_pick(\"check\", args, kwargs), \"\
+            {}\"))\n    spec = _load(_first(_pick(\"spec\", args, kwargs), \"{}\"\
+            ))\n    teaching = _first(_pick(\"teaching\", args, kwargs), \"\") or\
+            \ \"\"\n    rounds = _first(_pick(\"rounds\", args, kwargs), 1)\n\n  \
+            \  node_name = spec.get(\"node_name\", \"\")\n    file_name = spec.get(\"\
+            file_name\", \"\") or ((node_name + \".py\") if node_name else \"\")\n\
+            \n    envelope = {\n        \"schema_version\": \"1.0\",\n        \"valid\"\
+            : bool(code),\n        \"node_name\": node_name,\n        \"class_name\"\
+            : spec.get(\"class_name\", \"\"),\n        \"file_name\": file_name,\n\
+            \        \"code\": code,\n        \"passed\": bool(check.get(\"passed\"\
+            , False)),\n        \"errors\": check.get(\"errors\", []),\n        \"\
+            warnings\": check.get(\"warnings\", []),\n        \"summary\": check.get(\"\
+            summary\", \"\"),\n        \"rounds\": rounds,\n        \"teaching\":\
+            \ teaching\n    }\n    return {\"envelope\": MARK_L + json.dumps(envelope,\
+            \ ensure_ascii=False) + MARK_R}"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Script_EnvB
+      type: Script
+      name: 脚本4-信封组装B(修复)
+      x: 7154
+      y: 136
+      config:
+        inputParams:
+        - key: code
+          type: String
+          value: "${Iterator_3aWV.code}"
+          valueFrom: refer
+        - key: check
+          type: String
+          value: "${Iterator_3aWV.final_check}"
+          valueFrom: refer
+        - key: teaching
+          type: String
+          value: "${LLM_ips1.result}"
+          valueFrom: refer
+        - key: spec
+          type: String
+          value: "${LLM_3GUn.result}"
+          valueFrom: refer
+        - key: rounds
+          type: String
+          value: "${Iterator_3aWV.code}"
+          valueFrom: refer
+        outputParams:
+        - key: envelope
+          type: String
+          desc: 统一信封 JSON（带 ENV 标记）
+        nodeParam:
+          scriptContent: "import json\n\n\ndef _pick(name, args, kwargs):\n    p =\
+            \ globals().get(\"params\")\n    if isinstance(p, dict) and name in p:\n\
+            \        return p[name]\n    if name in kwargs and kwargs[name] is not\
+            \ None:\n        return kwargs[name]\n    for a in args:\n        if isinstance(a,\
+            \ dict):\n            if name in a and not isinstance(a[name], dict):\n\
+            \                return a[name]\n            for holder in (\"params\"\
+            , \"inputs\", \"variables\"):\n                inner = a.get(holder)\n\
+            \                if isinstance(inner, dict) and name in inner:\n     \
+            \               return inner[name]\n    g = globals()\n    if name in\
+            \ g:\n        return g[name]\n    return None\n\n\ndef _first(x, default=None):\n\
+            \    if isinstance(x, list):\n        return x[-1] if x else default\n\
+            \    return x if x is not None else default\n\n\ndef _load(text):\n  \
+            \  if not isinstance(text, str):\n        text = json.dumps(text, ensure_ascii=False)\
+            \ if text is not None else \"\"\n    t = text.strip()\n    if t.startswith(\"\
+            ```\"):\n        parts = t.split(\"```\")\n        if len(parts) >= 3:\n\
+            \            t = parts[1]\n        if t.lstrip()[:4].lower() == \"json\"\
+            :\n            t = t.lstrip()[4:]\n    l, r = t.find(\"{\"), t.rfind(\"\
+            }\")\n    if l == -1 or r == -1:\n        return {}\n    try:\n      \
+            \  return json.loads(t[l:r + 1])\n    except Exception:\n        return\
+            \ {}\n\n\ndef _strip_fence(code):\n    if not isinstance(code, str):\n\
+            \        return \"\"\n    t = code.strip()\n    if t.startswith(\"```\"\
+            ):\n        parts = t.split(\"```\")\n        if len(parts) >= 3:\n  \
+            \          body = parts[1]\n            for lang in (\"python\", \"Python\"\
+            , \"py\"):\n                if body.lstrip().lower().startswith(lang):\n\
+            \                    body = body.lstrip()[len(lang):]\n              \
+            \      break\n            return body.strip()\n    return t\n\n\nMARK_L\
+            \ = \"<!--ENV_START-->\"\nMARK_R = \"<!--ENV_END-->\"\n\n\ndef main(*args,\
+            \ **kwargs):\n    code = _strip_fence(_first(_pick(\"code\", args, kwargs),\
+            \ \"\"))\n    check = _load(_first(_pick(\"check\", args, kwargs), \"\
+            {}\"))\n    spec = _load(_first(_pick(\"spec\", args, kwargs), \"{}\"\
+            ))\n    teaching = _first(_pick(\"teaching\", args, kwargs), \"\") or\
+            \ \"\"\n    rounds = _first(_pick(\"rounds\", args, kwargs), 1)\n\n  \
+            \  node_name = spec.get(\"node_name\", \"\")\n    file_name = spec.get(\"\
+            file_name\", \"\") or ((node_name + \".py\") if node_name else \"\")\n\
+            \n    envelope = {\n        \"schema_version\": \"1.0\",\n        \"valid\"\
+            : bool(code),\n        \"node_name\": node_name,\n        \"class_name\"\
+            : spec.get(\"class_name\", \"\"),\n        \"file_name\": file_name,\n\
+            \        \"code\": code,\n        \"passed\": bool(check.get(\"passed\"\
+            , False)),\n        \"errors\": check.get(\"errors\", []),\n        \"\
+            warnings\": check.get(\"warnings\", []),\n        \"summary\": check.get(\"\
+            summary\", \"\"),\n        \"rounds\": rounds,\n        \"teaching\":\
+            \ teaching\n    }\n    return {\"envelope\": MARK_L + json.dumps(envelope,\
+            \ ensure_ascii=False) + MARK_R}"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Script_9tSI
+      type: Script
+      name: 脚本5
+      x: 8094
+      y: 287
+      config:
+        inputParams:
+        - key: env_a
+          type: String
+          value: "${Script_EnvA.envelope}"
+          valueFrom: refer
+        - key: env_b
+          type: String
+          value: "${Script_EnvB.envelope}"
+          valueFrom: refer
+        outputParams:
+        - key: envelope
+          type: String
+          desc: 归并后的唯一信封（带 ENV 标记）
+          properties: []
+        nodeParam:
+          scriptContent: "import json\n\n\ndef _pick(name, args, kwargs):\n    p =\
+            \ globals().get(\"params\")\n    if isinstance(p, dict) and name in p:\n\
+            \        return p[name]\n    if name in kwargs and kwargs[name] is not\
+            \ None:\n        return kwargs[name]\n    for a in args:\n        if isinstance(a,\
+            \ dict):\n            if name in a and not isinstance(a[name], dict):\n\
+            \                return a[name]\n            for holder in (\"params\"\
+            , \"inputs\", \"variables\"):\n                inner = a.get(holder)\n\
+            \                if isinstance(inner, dict) and name in inner:\n     \
+            \               return inner[name]\n    g = globals()\n    if name in\
+            \ g:\n        return g[name]\n    return None\n\n\ndef _cands(v):\n  \
+            \  out = []\n    if v is None:\n        return out\n    if isinstance(v,\
+            \ str):\n        out.append(v)\n        return out\n    if isinstance(v,\
+            \ (list, tuple)):\n        for it in v:\n            out.extend(_cands(it))\n\
+            \        return out\n    out.append(str(v))\n    return out\n\n\nMARK_L\
+            \ = \"<!--ENV_START-->\"\nMARK_R = \"<!--ENV_END-->\"\n\n\ndef _first_env(texts):\n\
+            \    for s in texts:\n        s = (s or \"\").strip()\n        if not\
+            \ s or s == \"null\":\n            continue\n        l = s.find(\"{\"\
+            ); r = s.rfind(\"}\")\n        if l == -1 or r == -1 or r <= l:\n    \
+            \        continue\n        try:\n            obj = json.loads(s[l:r +\
+            \ 1])\n        except Exception:\n            continue\n        if isinstance(obj,\
+            \ dict) and \"valid\" in obj:\n            return MARK_L + json.dumps(obj,\
+            \ ensure_ascii=False) + MARK_R\n    return MARK_L + json.dumps({\"valid\"\
+            : False, \"code\": \"\", \"passed\": False, \"errors\": [\"no envelope\"\
+            ], \"teaching\": \"\"}, ensure_ascii=False) + MARK_R\n\n\ndef main(*args,\
+            \ **kwargs):\n    a = _cands(_pick(\"env_a\", args, kwargs))\n    b =\
+            \ _cands(_pick(\"env_b\", args, kwargs))\n    return {\"envelope\": _first_env(a\
+            \ + b)}"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Output_wBaB
+      type: Output
+      name: 流程输出6
+      x: 8564
+      y: 287
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_9tSI.envelope}"
+          streamSwitch: true
+  globalConfig:
+    historyConfig:
+      historySwitch: false
+      historyMaxRound: 5
+    historyMaxRound: 5

@@ -1,0 +1,24 @@
+[Unit]
+Description=ACPs outbound gateway (Bailian HTTP -> mTLS + AIP -> Wutong partners)
+Documentation=file:/opt/acps-agent/acps-gateway/README.md
+After=network-online.target acps-agent.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/acps-agent/acps-gateway
+
+# gateway.py 自己会用 load_dotenv 读取工作目录下的 .env
+ExecStart=/opt/acps-agent/acps-gateway/venv/bin/python gateway.py
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=acps-gateway
+
+[Install]
+WantedBy=multi-user.target

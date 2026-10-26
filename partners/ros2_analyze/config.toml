@@ -1,0 +1,50 @@
+# ============================================================
+#  ROS2 需求分析 Partner（①）—— 运行配置
+#  端口 9021（与 acs.json 里的 endPoints[].url 保持一致）
+#
+#  本地联调时把下面三处改成 false / 换端口：
+#    identity_binding_enabled = false
+#    tls_enabled = false
+#    verify_client = false
+# ============================================================
+
+[app]
+# 身份绑定：从 mTLS 对端证书里提取 AIC，与消息 senderId 比对。
+# 没有正式证书时必须为 false，否则所有请求都会被拒。
+identity_binding_enabled = true
+
+# ---------------- 大模型档位 ----------------
+# fast 档：decision + analysis 两个阶段用，必须快（OPENAI 兼容接口）
+[llm.fast]
+api_key_env = "PARTNER_LLM_FAST_API_KEY"
+base_url_env = "PARTNER_LLM_FAST_BASE_URL"
+model_env = "PARTNER_LLM_FAST_MODEL"
+max_tokens = 1024
+temperature = 0.1
+
+# default 档：production 阶段用。指向本机 shim，最终落到百炼工作流 ①
+[llm.default]
+api_key_env = "PARTNER_LLM_DEFAULT_API_KEY"
+base_url_env = "PARTNER_LLM_DEFAULT_BASE_URL"
+model_env = "PARTNER_LLM_DEFAULT_MODEL"
+max_tokens = 4096
+temperature = 0.6
+
+# ---------------- 对外服务 ----------------
+[server]
+host = "0.0.0.0"
+port = 9021
+
+[server.mtls]
+tls_enabled = true
+verify_client = true
+cert_file = "server.pem"
+key_file = "server.key"
+ca_file = "trust-bundle.pem"
+
+# ---------------- 运行参数 ----------------
+[concurrency]
+max_concurrent_tasks = 4
+
+[log]
+level = "INFO"

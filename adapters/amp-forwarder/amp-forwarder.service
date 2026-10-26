@@ -1,0 +1,24 @@
+[Unit]
+Description=AMP log forwarder (local amp_*.jsonl -> platform Kafka)
+Documentation=file:/opt/acps-agent/amp-forwarder/README.md
+After=network-online.target acps-agent.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/acps-agent/amp-forwarder
+
+# forwarder.py 自己会用 load_dotenv 读取工作目录下的 .env
+ExecStart=/opt/acps-agent/amp-forwarder/venv/bin/python forwarder.py
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=amp-forwarder
+
+[Install]
+WantedBy=multi-user.target

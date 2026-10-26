@@ -1,0 +1,56 @@
+# ============================================================
+#  ROS2 学习编排智能体 —— 运行配置（平台上注册的那个"智能体"）
+#  端口 8449（8443 一般留给旧的教学 agent；9021-9023 是 ①②③）
+#
+#  ★ 关键差异：default 档指向【Leader :9200】而不是【shim :9099】
+#    所以这个实例的 .env 里要写：
+#        PARTNER_LLM_DEFAULT_BASE_URL=http://127.0.0.1:9200/v1
+#        PARTNER_LLM_DEFAULT_MODEL=leader
+#        PARTNER_LLM_DEFAULT_API_KEY=<Leader 的 AUTH_TOKEN>
+#    （Leader 提供 OpenAI 兼容入口 /v1/chat/completions）
+#
+#  本地联调：identity_binding_enabled / tls_enabled / verify_client 改 false
+# ============================================================
+
+[app]
+# 身份绑定：从 mTLS 对端证书里提取 AIC 并与消息 senderId 比对。
+# 没有正式证书时必须为 false，否则所有请求都会被拒。
+identity_binding_enabled = true
+
+# ---------------- 大模型档位 ----------------
+# fast 档：decision + analysis 两个阶段（只做判断和复制，指向小模型）
+[llm.fast]
+api_key_env = "PARTNER_LLM_FAST_API_KEY"
+base_url_env = "PARTNER_LLM_FAST_BASE_URL"
+model_env = "PARTNER_LLM_FAST_MODEL"
+max_tokens = 1024
+temperature = 0.1
+
+# default 档：production 阶段 —— ★ 指向本机 Leader（不是 shim）
+# 整条流水线最长可跑 3 分钟以上，输出上万字，token 给够
+[llm.default]
+api_key_env = "PARTNER_LLM_DEFAULT_API_KEY"
+base_url_env = "PARTNER_LLM_DEFAULT_BASE_URL"
+model_env = "PARTNER_LLM_DEFAULT_MODEL"
+max_tokens = 16384
+temperature = 0.6
+
+# ---------------- 对外服务 ----------------
+[server]
+host = "0.0.0.0"
+port = 8449
+
+[server.mtls]
+tls_enabled = true
+verify_client = true
+cert_file = "server.pem"
+key_file = "server.key"
+ca_file = "trust-bundle.pem"
+
+# ---------------- 运行参数 ----------------
+# 编排可能跑很久（转平台找搭档 20~60 秒；完整流水线 120~210 秒）
+[concurrency]
+max_concurrent_tasks = 4
+
+[log]
+level = "INFO"

@@ -1,0 +1,237 @@
+{
+  "aic": "",
+  "active": true,
+  "lastModifiedTime": "2026-10-16T10:00:00+08:00",
+  "protocolVersion": "02.02",
+  "name": "ROS2 项目规划与节点细化智能体",
+  "description": "ROS2 教学流水线的第二环（Partner）。把上游「需求分析」给出的功能规格 JSON，细化为可直接驱动代码生成的「节点规格 + 话题契约 + 项目骨架」，并产出面向学生的学习指南。不追问、不做需求理解（已由上游完成），只做规格细化与教学展开。\n\n【输入契约】调用方把上游需求分析信封里的 data 字段序列化成 JSON 字符串，随消息正文传入（也可走 requirement_json 结构化变量，二者取非空者，变量优先）。正文支持两种形态：A) 直接就是需求 JSON，形如 {\"schema_version\":...,\"project\":{...},\"modules\":[...]}；B) 外层包一层，形如 {\"original_request\":\"<内层为需求 JSON 字符串>\"}，两种均取最内层含 project/modules 的对象。字段缺失按合理默认补齐，不追问、不报错。纯文本咨询不作为本智能体的调用方式。无状态：不依赖上一轮记忆，请一次性传全。\n\n【输出契约】响应为一段文本，内含三块，供不同消费者各取所需（调用方用标记正则提取）：\n1) 前置正文（无标记）：🎓 学习指南（项目介绍 / 系统架构与数据流 / 涉及知识点 / 新手易错点 / 运行步骤），面向人类阅读，Markdown；\n2) <!--NODE_LIST_START--> ... <!--NODE_LIST_END-->：精简节点清单 {\"valid\":bool,\"nodes\":[{node_name,class_name,file_name,what_to_do,publish_topics[{topic,message_type}],subscribe_topics[同前]}]}，供调用方逐个并发派发给代码生成智能体；\n3) <!--PLAN_JSON_START--> ... <!--PLAN_JSON_END-->：完整规划 {\"valid\":bool,\"plan\":{project,nodes(含 core_logic、search_keywords),topic_overview[{topic,message_type,publisher,subscriber,purpose}],dependencies[],file_structure[]}}，供调用方渲染「项目规划书」。\n规划书正文不在本智能体输出中（已上移到调用方按 plan 渲染），本智能体只负责结构化数据与学习指南。valid=false 表示解析失败，调用方需降级。\n\n【能力范围】模块到 ROS2 节点的一对一映射与命名规范（节点 xxx_node / 类 XxxNode / 文件 xxx_node.py / 包名小写下划线）、话题与标准消息类型定稿（模块间话题在此确定，使下游节点可并发生成且无共享状态）、话题闭环二次复检（外部传感器/执行器话题白名单除外）、功能包骨架（package.xml / setup.py / setup.cfg / launch）、面向教学的学习指南生成并挂载 ROS2 知识库检索。\n\n【明确拒绝】① 产出可运行的节点 .py 代码（属下游代码生成智能体）；② 需求追问与需求理解（属上游需求分析智能体）；③ C++ 项目规划（仅 Python / ament_python）；④ Nav2 / MoveIt2 等高级库的深度架构设计；⑤ 硬件选型、电路、真机部署与实机操控；⑥ 与 ROS2 无关的通用软件工程咨询。混合请求只保留 ROS2 规划相关部分并说明拒绝项。\n\n【性能】规划细化 + 知识库检索 + 指南生成，端到端约 20~45 秒（指南生成为主要耗时）。建议调用方超时设为 120 秒。",
+  "version": "1.0.0",
+  "provider": {
+    "countryCode": "CN",
+    "organization": "Personal Project",
+    "name": "Your Name",
+    "email": "you@example.com"
+  },
+  "securitySchemes": {
+    "mtls": {
+      "type": "mutualTLS",
+      "description": "智能体间 mTLS 双向认证，证书由 ACPs CA 签发"
+    }
+  },
+  "endPoints": [
+    {
+      "url": "https://YOUR_HOST:9022/rpc",
+      "transport": "JSONRPC",
+      "security": [
+        {
+          "mtls": []
+        }
+      ]
+    }
+  ],
+  "certificate": {
+    "altNames": {
+      "ip": [
+        "YOUR_HOST"
+      ]
+    },
+    "requestedValidity": 365
+  },
+  "capabilities": {
+    "streaming": false,
+    "notification": false,
+    "messageQueue": []
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "ros2-planning.plan-from-spec",
+      "name": "规格驱动的项目规划（机器接口）",
+      "description": "面向上游编排智能体的确定性规划接口。输入功能规格 JSON，输出节点清单（精简版，供并发派发代码生成）与完整规划 JSON（含话题总览、依赖、文件骨架），同时产出学习指南正文。话题与消息类型在此定稿，使下游多个节点可无共享状态地并发生成。不做追问、不改上游已定的模块划分、不产出代码。对上游字段缺失用合理默认补齐而非报错。输出中的结构化块带固定标记，调用方用 <!--NODE_LIST_START|END--> 与 <!--PLAN_JSON_START|END--> 正则提取后即可 json.loads。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "项目规划",
+        "节点细化",
+        "话题契约",
+        "结构化输入",
+        "结构化输出",
+        "机器接口",
+        "Partner",
+        "流水线第二环",
+        "无状态",
+        "并发友好",
+        "可被委派"
+      ],
+      "examples": [
+        "{\"requirement_json\":\"{\\\"schema_version\\\":\\\"1.0\\\",\\\"project\\\":{\\\"name_en\\\":\\\"obstacle_avoidance\\\",\\\"package_name\\\":\\\"obstacle_avoidance\\\",\\\"difficulty\\\":\\\"入门\\\"},\\\"modules\\\":[{\\\"module_name\\\":\\\"obstacle_detector\\\",\\\"inputs\\\":[{\\\"topic\\\":\\\"/scan\\\",\\\"message_type\\\":\\\"sensor_msgs/msg/LaserScan\\\"}],\\\"outputs\\\":[{\\\"topic\\\":\\\"/obstacle_distance\\\",\\\"message_type\\\":\\\"std_msgs/msg/Float32\\\"}}]}]}\"}",
+        "{\"requirement_json\":\"{...巡线小车三模块规格...}\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/markdown"
+      ]
+    },
+    {
+      "id": "ros2-planning.project-skeleton",
+      "name": "功能包骨架与文件清单",
+      "description": "为规划出的多节点项目生成 ament_python 功能包结构清单：package.xml、setup.py、setup.cfg、launch 文件、各节点 .py 的相对路径，以及需要 source 的依赖包列表（rclpy 及各 sensor_msgs/std_msgs/geometry_msgs 等）。以 plan.file_structure 与 plan.dependencies 字段随规划结果一并返回，供调用方落盘建目录。仅输出清单与结构，不生成包内代码正文，也不代为执行 colcon 构建。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "功能包",
+        "ament_python",
+        "package.xml",
+        "setup.py",
+        "launch",
+        "colcon",
+        "项目骨架",
+        "机器接口"
+      ],
+      "examples": [
+        "为避障小车规划出包结构（含 2 个节点、1 个 launch）",
+        "列出这个项目需要 source 的 ROS2 包"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "ros2-planning.study-guide",
+      "name": "项目学习指南生成",
+      "description": "面向学生与实训教师的教学输出。基于确定的节点与话题结构，结合 ROS2 知识库检索结果，生成学习指南：项目一句话介绍、系统架构与数据流（节点A→/话题→节点B 的箭头图）、该项目涉及的知识点逐条解释、3-5 个新手易错点（错误现象/原因/规避，优先取知识库错误集）、colcon 编译与 launch 运行步骤、进阶建议。语气亲切、适合大学生水平。指南正文作为输出的前置部分直接可读，无需正则提取；若知识库无命中会显式标注并回退到通用讲解，不编造。",
+      "version": "1.0.0",
+      "tags": [
+        "ROS2",
+        "学习指南",
+        "知识点讲解",
+        "易错点",
+        "运行步骤",
+        "教学",
+        "实训",
+        "学生友好"
+      ],
+      "examples": [
+        "这个避障小车项目涉及哪些知识点，容易踩什么坑",
+        "规划好了节点，给我一份能直接发给学生的指南"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/markdown",
+        "text/plain"
+      ]
+    }
+  ],
+  "entityMeta": {
+    "projectFamily": "ros2-learning-agent-pipeline",
+    "pipelineRole": "partner-2-project-planning",
+    "pipelineOrder": 2,
+    "stateless": true,
+    "upstreamPartners": [
+      "ros2-requirement.analyze"
+    ],
+    "downstreamPartners": [
+      "ros2-codegen.node-from-spec"
+    ],
+    "rosVersion": [
+      "humble",
+      "jazzy"
+    ],
+    "language": [
+      "python"
+    ],
+    "codeTargets": [
+      "node",
+      "launch",
+      "package(ament_python)"
+    ],
+    "outputContract": {
+      "humanReadable": "前置学习指南 Markdown，无需提取",
+      "machineBlocks": [
+        {
+          "name": "node_list",
+          "markers": [
+            "<!--NODE_LIST_START-->",
+            "<!--NODE_LIST_END-->"
+          ],
+          "fields": [
+            "valid",
+            "nodes[]"
+          ],
+          "nodeItemFields": [
+            "node_name",
+            "class_name",
+            "file_name",
+            "what_to_do",
+            "publish_topics",
+            "subscribe_topics"
+          ],
+          "purpose": "供调用方逐个并发派发代码生成"
+        },
+        {
+          "name": "plan",
+          "markers": [
+            "<!--PLAN_JSON_START-->",
+            "<!--PLAN_JSON_END-->"
+          ],
+          "fields": [
+            "valid",
+            "plan"
+          ],
+          "planFields": [
+            "project",
+            "nodes",
+            "topic_overview",
+            "dependencies",
+            "file_structure"
+          ],
+          "purpose": "供调用方渲染项目规划书"
+        }
+      ],
+      "projectBookRendered": false,
+      "projectBookNote": "规划书正文已上移到调用方（Leader）按 plan 渲染，本智能体不再输出规划书正文",
+      "parseRobustness": "标记正则提取，容忍前后空白与 null 占位"
+    },
+    "topicDesign": {
+      "contractLockedHere": true,
+      "closedLoopRecheck": true,
+      "externalTopicWhitelist": [
+        "/scan",
+        "/cmd_vel",
+        "/odom",
+        "/map",
+        "/tf",
+        "/imu",
+        "/joint_states"
+      ]
+    },
+    "latencyMs": "20000-45000",
+    "timeoutRecommendMs": 120000,
+    "externalDependencies": [
+      "ROS2 知识库检索插件（HTTP，用于知识点/错误集/代码模板）"
+    ],
+    "targetUsers": [
+      "高职/本科实训学生",
+      "实训教师",
+      "上游编排智能体（Leader）"
+    ],
+    "intendedCallers": [
+      "ROS2 教学主控编排智能体"
+    ]
+  }
+}

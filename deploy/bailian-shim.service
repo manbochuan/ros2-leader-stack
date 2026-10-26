@@ -1,0 +1,30 @@
+[Unit]
+Description=Bailian Workflow -> OpenAI compatible shim (for ACPs Partner)
+Documentation=file:/opt/acps-agent/bailian-shim/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=acps
+Group=acps
+WorkingDirectory=/opt/acps-agent/bailian-shim
+
+# 注意：这里故意不用 EnvironmentFile。
+# shim.py 自己会用 load_dotenv() 读取工作目录下的 .env，
+# 这样能避免 systemd 解析 .env 失败导致服务起不来。
+ExecStart=/opt/acps-agent/bailian-shim/venv/bin/uvicorn shim:app --host 127.0.0.1 --port 9099
+
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bailian-shim
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,31 @@
+[Unit]
+Description=Bailian Workflow -> OpenAI compatible shim (for ACPs Partner)
+Documentation=file:/opt/acps-agent/bailian-shim/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=acps
+Group=acps
+WorkingDirectory=/opt/acps-agent/bailian-shim
+EnvironmentFile=/opt/acps-agent/bailian-shim/.env
+ExecStart=/opt/acps-agent/bailian-shim/venv/bin/uvicorn shim:app --host 127.0.0.1 --port 9099
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+
+# 日志进 journald：journalctl -u bailian-shim -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bailian-shim
+
+# 基础加固：本服务只需要访问网络和读自己的目录
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/acps-agent/bailian-shim
+
+[Install]
+WantedBy=multi-user.target

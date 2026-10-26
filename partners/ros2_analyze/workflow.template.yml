@@ -1,0 +1,769 @@
+app:
+  mode: workflow
+  name: 需求分析
+  subMode: chat
+kind: app
+version: 0.1.0
+workflow:
+  graph:
+    edges:
+    - id: Start_Y0nM-Start_Y0nM-LLM_7DJ6-LLM_7DJ6
+      source: Start_Y0nM
+      sourceHandle: Start_Y0nM
+      target: LLM_7DJ6
+      targetHandle: LLM_7DJ6
+    - id: LLM_7DJ6-LLM_7DJ6-Output_upR5-Output_upR5
+      source: LLM_7DJ6
+      sourceHandle: LLM_7DJ6
+      target: Output_upR5
+      targetHandle: Output_upR5
+    - id: Output_upR5-Output_upR5-Script_rtRL-Script_rtRL
+      source: Output_upR5
+      sourceHandle: Output_upR5
+      target: Script_rtRL
+      targetHandle: Script_rtRL
+    - id: Script_rtRL-Script_rtRL-Judge_E7GH-Judge_E7GH
+      source: Script_rtRL
+      sourceHandle: Script_rtRL
+      target: Judge_E7GH
+      targetHandle: Judge_E7GH
+    - id: Judge_E7GH-Judge_E7GH_default-Iterator_171V-Iterator_171V
+      source: Judge_E7GH
+      sourceHandle: Judge_E7GH_default
+      target: Iterator_171V
+      targetHandle: Iterator_171V
+    - id: Iterator_171V-Iterator_171V-Script_Ijod-Script_Ijod
+      source: Iterator_171V
+      sourceHandle: Iterator_171V
+      target: Script_Ijod
+      targetHandle: Script_Ijod
+    - id: Judge_E7GH-Judge_E7GH_Dajm-Script_Ijod-Script_Ijod
+      source: Judge_E7GH
+      sourceHandle: Judge_E7GH_Dajm
+      target: Script_Ijod
+      targetHandle: Script_Ijod
+    - id: Script_Ijod-Script_Ijod-Output_WRy3-Output_WRy3
+      source: Script_Ijod
+      sourceHandle: Script_Ijod
+      target: Output_WRy3
+      targetHandle: Output_WRy3
+    - id: Output_WRy3-Output_WRy3-End_7JNw-End_7JNw
+      source: Output_WRy3
+      sourceHandle: Output_WRy3
+      target: End_7JNw
+      targetHandle: End_7JNw
+    nodes:
+    - id: Start_Y0nM
+      type: Start
+      name: 开始
+      x: 12
+      y: 188
+      config:
+        inputParams: []
+        outputParams:
+        - key: leader_context
+          type: String
+          desc: Leader 初步拆解
+        - key: history
+          type: String
+          desc: need_ask 追问后用户的补充（首轮传空字符串）
+        nodeParam: {}
+    - id: End_7JNw
+      type: End
+      name: 结束
+      x: 5974
+      y: 188
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          jsonParams:
+          - key: en
+            valueFrom: refer
+            type: String
+          streamSwitch: true
+          outputType: text
+          processCanOutput: false
+          textTemplate: "${Script_Ijod.envelope}"
+    - id: LLM_7DJ6
+      type: LLM
+      name: 大模型1
+      x: 482
+      y: 188
+      config:
+        inputParams: []
+        outputParams:
+        - key: result
+          type: String
+          desc: 文本输出
+        - key: reasoningContent
+          type: String
+          desc: 深度思考
+        nodeParam:
+          shortMemory:
+            enabled: true
+            type: self
+            round: 5
+            param:
+              key: historyList
+              type: Array<String>
+              valueFrom: refer
+              value: "${sys.historyList}"
+          tryCatchConfig:
+            strategy: noop
+            defaultValues:
+            - key: result
+              type: String
+              desc: 文本输出
+              isSystem: true
+          batchEnable: false
+          modelConfig:
+            modelId: qwen3.8-max
+            params:
+              top_p: 0.8
+              temperature: 0.7
+              enable_thinking: true
+              thinking_budget: 4000
+              result_format: message
+            referParams:
+            - type: String
+              key: vlImageUrl
+              desc: 图片地址
+              valueFrom: refer
+            - type: String
+              key: vlVideoUrl
+              desc: 视频地址
+              valueFrom: refer
+            modelName: Qwen3.8-Max
+            capabilities:
+            - Reasoning
+            - VU
+            - TG
+            - VU
+            - IU
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          concurrentSize: 5
+          processCanOutput: false
+          contextParam:
+            key: historyList
+            type: Array<String>
+            valueFrom: refer
+            value: "${sys.historyList}"
+          sysPromptContent: "你是 ROS2 教学项目的需求分析师，负责把学生模糊的自然语言需求转化为结构化的「功能规格 JSON」。\n\
+            \n你不写 ROS2 代码、不设计节点类名/文件名、不写教学内容——节点细化由下游的项目规划师完成，你只负责需求理解、功能划分与业务流规划。\
+            \n\n【输入说明】\n- 学生原始需求：${sys.query}\n- Leader 初步拆解：${Start_Y0nM.leader_context}与\
+            学生原话冲突时以学生原话为准\n- 历史补充：${Start_Y0nM.history}上一轮追问后学生的补充信息，首轮为空\n\n【任务步\
+            骤】\n1. 综合三类输入，判断需求是否足够清晰。\n2. need_ask 判定：\n   - need_ask=true 仅限两种情况：\
+            ①连做什么项目都判断不出来；②核心功能完全无法推断。\n   - 学生只要说明了项目方向，传感器型号、具体参数、底盘形式等细节一律合理推测，\
+            禁止追问。\n   - need_ask=true 时，ask_question 给出一道不超过 4 个选项的选择题，格式如：\"你想做哪种\
+            避障？\\nA.激光雷达避障 B.超声波避障 C.红外避障 D.其他（请说明）\"\n3. need_ask=false 时完成功能划分：\n\
+            \   - 推测项目英文名/中文名/包名（小写+下划线）、一句话描述、难度。\n   - 难度参考：单传感器、2 个功能模块 → 入门；多传\
+            感器或含简单决策逻辑 → 进阶；含导航/SLAM/多状态行为 → 综合。\n   - 模块数量：入门 2 个、进阶 3 个、综合 4 个。\n\
+            \   - 每个模块给出：功能描述、输入列表、输出列表、依赖包；输出尽量建议话题名（/开头、小写+下划线）与标准 ROS2 消息类型，不确定\
+            时给最合理推测，不要留空。\n   - 业务流自检：每个\"来自其他模块\"的输入话题，必须能在某个模块的输出话题中找到；传感器原始数据、\
+            /cmd_vel 等外部话题除外。\n4. 避障类项目的功能基线（学生说避障且信息不足时按此推测）：\n   - 模块一 obstacle_detector：\
+            传感器数据 → 计算障碍物距离 → 输出 /obstacle_distance（std_msgs/msg/Float32）\n   - 模块\
+            二 motion_controller：订阅 /obstacle_distance → 决策运动 → 输出 /cmd_vel（geometry_msgs/msg/Twist）\
+            \n\n【输出要求（最高优先级）】\n- 只输出一个 JSON 对象。禁止 markdown 代码块围栏、禁止任何解释或前后缀文字。\n-\
+            \ 布尔值必须是 JSON 的 true/false，禁止写成 \"true\" 字符串。\n- 严格符合以下 Schema：\n\n{\n\
+            \  \"schema_version\": \"1.0\",\n  \"need_ask\": false,\n  \"ask_question\"\
+            : \"无需追问\",\n  \"project\": {\n    \"name_en\": \"obstacle_avoidance\"\
+            ,\n    \"name_cn\": \"避障小车\",\n    \"package_name\": \"obstacle_avoidance\"\
+            ,\n    \"difficulty\": \"入门\",\n    \"description\": \"激光雷达检测障碍物距离并自动避\
+            障的两轮差速小车\"\n  },\n  \"modules\": [\n    {\n      \"module_name\": \"obstacle_detector\"\
+            ,\n      \"function\": \"订阅激光雷达 /scan，计算最近障碍物距离并发布\",\n      \"inputs\"\
+            : [\n        {\"topic\": \"/scan\", \"message_type\": \"sensor_msgs/msg/LaserScan\"\
+            , \"description\": \"激光雷达原始扫描数据（外部输入）\"}\n      ],\n      \"outputs\"\
+            : [\n        {\"topic\": \"/obstacle_distance\", \"message_type\": \"\
+            std_msgs/msg/Float32\", \"description\": \"最近障碍物距离，单位米\"}\n      ],\n\
+            \      \"dependencies\": [\"rclpy\", \"sensor_msgs\", \"std_msgs\"]\n\
+            \    },\n    {\n      \"module_name\": \"motion_controller\",\n      \"\
+            function\": \"订阅障碍物距离，低于阈值时减速转向，发布速度指令\",\n      \"inputs\": [\n     \
+            \   {\"topic\": \"/obstacle_distance\", \"message_type\": \"std_msgs/msg/Float32\"\
+            , \"description\": \"最近障碍物距离\"}\n      ],\n      \"outputs\": [\n    \
+            \    {\"topic\": \"/cmd_vel\", \"message_type\": \"geometry_msgs/msg/Twist\"\
+            , \"description\": \"底盘速度指令（外部执行）\"}\n      ],\n      \"dependencies\"\
+            : [\"rclpy\", \"std_msgs\", \"geometry_msgs\"]\n    }\n  ]\n}\n\nneed_ask=true\
+            \ 时，project 与 modules 给 null，ask_question 必须填写选择题。"
+          promptContent: "【学生原始需求】${sys.query}\n​【Leader 初步拆解】${Start_Y0nM.leader_context}\n\
+            ​【历史补充】${Start_Y0nM.history}"
+          cacheStrategy: disabled
+          batchSize: 50
+          contextSwitch: true
+    - id: Output_upR5
+      type: Output
+      name: 流程输出1
+      x: 952
+      y: 188
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${LLM_7DJ6.result}"
+          streamSwitch: true
+    - id: Script_rtRL
+      type: Script
+      name: 脚本1
+      x: 1422
+      y: 171
+      config:
+        inputParams:
+        - key: llm_output
+          type: String
+          value: "${LLM_7DJ6.result}"
+          valueFrom: refer
+        outputParams:
+        - key: passed
+          type: Boolean
+          desc: 通过结果
+          properties: []
+        - key: envelope
+          type: String
+          desc: ""
+        - key: raw
+          type: String
+          desc: ""
+        - key: error_msg
+          type: String
+          desc: ""
+        nodeParam:
+          scriptContent: "import json\nimport re\n\nTOPIC_RE = re.compile(r\"(?<![\\\
+            w/])/[A-Za-z_][A-Za-z0-9_]*\")\n\n# 外部话题白名单：传感器/执行器等不由本项目模块生产的话题\nEXTERNAL_TOPICS\
+            \ = {\n    \"/scan\", \"/cmd_vel\", \"/odom\", \"/map\", \"/tf\", \"/tf_static\"\
+            , \"/clock\",\n    \"/image_raw\", \"/camera/image_raw\", \"/imu\", \"\
+            /joint_states\"\n}\n\n\ndef extract_json(text):\n    \"\"\"从可能带 markdown\
+            \ 围栏或解释文字的文本中提取首个 JSON 对象\"\"\"\n    if not text:\n        return None,\
+            \ \"模型输出为空\"\n    t = text.strip()\n    # 去除 ```json ... ``` 围栏\n    if\
+            \ t.startswith(\"```\"):\n        parts = t.split(\"```\")\n        if\
+            \ len(parts) >= 3:\n            t = parts[1]\n        if t.lstrip()[:4].lower()\
+            \ == \"json\":\n            t = t.lstrip()[4:]\n    left, right = t.find(\"\
+            {\"), t.rfind(\"}\")\n    if left == -1 or right == -1 or right <= left:\n\
+            \        return None, \"输出中未找到 JSON 对象\"\n    try:\n        return json.loads(t[left:right\
+            \ + 1]), \"\"\n    except Exception as e:\n        return None, \"JSON\
+            \ 解析失败: %s\" % str(e)\n\n\ndef validate(data):\n    \"\"\"结构校验 + 话题闭环检\
+            查，返回错误信息列表\"\"\"\n    errors = []\n    if not isinstance(data, dict):\n\
+            \        return [\"根节点必须是 JSON 对象\"]\n\n    # need_ask 必须是布尔值\n    if\
+            \ not isinstance(data.get(\"need_ask\"), bool):\n        errors.append(\"\
+            need_ask 必须为布尔值 true/false\")\n\n    # 追问场景：只校验 ask_question\n    if data.get(\"\
+            need_ask\") is True:\n        if not str(data.get(\"ask_question\", \"\
+            \")).strip():\n            errors.append(\"need_ask=true 时 ask_question\
+            \ 必填\")\n        return errors\n\n    # 正常场景：project 校验\n    project =\
+            \ data.get(\"project\")\n    if not isinstance(project, dict):\n     \
+            \   errors.append(\"project 缺失或不是对象\")\n    else:\n        for field in\
+            \ (\"name_en\", \"name_cn\", \"package_name\", \"difficulty\", \"description\"\
+            ):\n            if not str(project.get(field, \"\")).strip():\n      \
+            \          errors.append(\"project.%s 缺失\" % field)\n\n    # modules 校\
+            验\n    modules = data.get(\"modules\")\n    if not isinstance(modules,\
+            \ list) or len(modules) == 0:\n        errors.append(\"modules 必须为非空数组\
+            \")\n        return errors\n\n    produced = set()\n    for i, module\
+            \ in enumerate(modules):\n        prefix = \"modules[%d]\" % i\n     \
+            \   if not isinstance(module, dict):\n            errors.append(prefix\
+            \ + \" 必须是对象\")\n            continue\n        if not str(module.get(\"\
+            module_name\", \"\")).strip():\n            errors.append(prefix + \"\
+            .module_name 缺失\")\n        if not str(module.get(\"function\", \"\")).strip():\n\
+            \            errors.append(prefix + \".function 缺失\")\n        if not\
+            \ isinstance(module.get(\"inputs\"), list):\n            errors.append(prefix\
+            \ + \".inputs 必须是数组\")\n        if not isinstance(module.get(\"outputs\"\
+            ), list):\n            errors.append(prefix + \".outputs 必须是数组\")\n  \
+            \      for out in module.get(\"outputs\", []):\n            if isinstance(out,\
+            \ dict) and out.get(\"topic\"):\n                produced.add(out[\"topic\"\
+            ])\n\n    # 话题闭环：内部输入话题必须有生产模块\n    for i, module in enumerate(modules):\n\
+            \        if not isinstance(module, dict):\n            continue\n    \
+            \    prefix = \"modules[%d]\" % i\n        name = str(module.get(\"module_name\"\
+            , \"\")).strip() or prefix\n        inputs = module.get(\"inputs\", [])\
+            \ or []\n        outputs = module.get(\"outputs\", []) or []\n\n     \
+            \   for inp in inputs:\n            if not isinstance(inp, dict):\n  \
+            \              continue\n            topic = inp.get(\"topic\", \"\")\n\
+            \            if topic and topic not in produced and topic not in EXTERNAL_TOPICS:\n\
+            \                errors.append(\"话题 %s 没有生产模块（且不在外部话题白名单）\" % topic)\n\
+            \n        # 交叉校验：禁止通过删除字段来通过校验\n        declared = set()\n        for\
+            \ item in list(inputs) + list(outputs):\n            if isinstance(item,\
+            \ dict) and item.get(\"topic\"):\n                declared.add(item[\"\
+            topic\"])\n        desc = \"%s %s\" % (module.get(\"function\", \"\"),\
+            \ module.get(\"description\", \"\"))\n        for topic in sorted(set(TOPIC_RE.findall(desc))):\n\
+            \            if topic not in declared:\n                errors.append(\n\
+            \                    \"模块 %s 的 function 提到话题 %s，但 inputs/outputs 里没有声明\
+            （禁止用删除字段的方式通过校验；请补齐该话题的声明，并为模块间话题补齐生产者模块）\"\n                    % (name,\
+            \ topic)\n                )\n        if \"订阅\" in str(module.get(\"function\"\
+            , \"\")) and not inputs:\n            errors.append(\n               \
+            \ \"模块 %s 的 function 写明「订阅」但 inputs 为空（禁止删除订阅声明来通过校验；请把被订阅话题补回 inputs，\
+            并为模块间话题补一个生产者模块）\"\n                % name\n            )\n\n    return\
+            \ errors\n\n\ndef _pick(name, args, kwargs):\n    \"\"\"从多来源取入参：kwargs\
+            \ > 位置参数字典 > 模块全局变量（百炼把入参注入为模块级变量）\"\"\"\n    if name in kwargs and kwargs[name]\
+            \ is not None:\n        return kwargs[name]\n    for a in args:\n    \
+            \    if isinstance(a, dict):\n            if name in a and not isinstance(a[name],\
+            \ dict):\n                return a[name]\n            for holder in (\"\
+            params\", \"inputs\", \"variables\"):\n                inner = a.get(holder)\n\
+            \                if isinstance(inner, dict) and name in inner:\n     \
+            \               return inner[name]\n    g = globals()\n    if name in\
+            \ g:\n        return g[name]\n    if isinstance(g.get(\"params\"), dict)\
+            \ and name in g[\"params\"]:\n        return g[\"params\"][name]\n   \
+            \ return None\n\n\ndef main(*args, **kwargs):\n    # 百炼脚本节点入口：平台以「无参」调\
+            用 main()，入参以模块全局变量注入\n    raw = _pick(\"llm_output\", args, kwargs) or\
+            \ \"\"\n    raw = raw if isinstance(raw, str) else str(raw)\n    raw =\
+            \ raw.strip()\n\n    data, parse_err = extract_json(raw)\n    error_msg\
+            \ = parse_err\n    if data is not None:\n        error_list = validate(data)\n\
+            \        error_msg = \"；\".join(error_list)\n\n    # 注意：passed 是 Python\
+            \ 布尔值 True/False，下游按布尔比较\n    passed = data is not None and error_msg\
+            \ == \"\"\n\n    if passed:\n        envelope = json.dumps({\n       \
+            \     \"valid\": True,\n            \"need_ask\": data.get(\"need_ask\"\
+            , False),\n            \"ask_question\": data.get(\"ask_question\", \"\
+            \"),\n            \"data\": data\n        }, ensure_ascii=False)\n   \
+            \ else:\n        # 脚本1 失败时不产出信封，交由修复循环处理\n        envelope = \"\"\n\n\
+            \    return {\n        \"passed\": passed,\n        \"envelope\": envelope,\n\
+            \        \"raw\": raw,\n        \"error_msg\": error_msg\n    }"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Judge_E7GH
+      type: Judge
+      name: 条件判断1
+      x: 1892
+      y: 152
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          branches:
+          - id: default
+            label: 默认条件
+            targetIds:
+            - Iterator_171V
+          - id: Dajm
+            label: 新条件组1
+            logic: and
+            conditions:
+            - left:
+                valueFrom: refer
+                type: Boolean
+                value: "${Script_rtRL.passed}"
+              right:
+                valueFrom: input
+                type: Boolean
+              operator: isTrue
+            targetIds:
+            - Script_Ijod
+    - id: Iterator_171V
+      type: Iterator
+      name: 循环1
+      x: 2362
+      y: 23
+      config:
+        inputParams: []
+        outputParams:
+        - key: envelope
+          type: Array<String>
+          value: "${Script_vhge.[envelope]}"
+          valueFrom: refer
+        nodeParam:
+          countLimit: 1
+          variableParameters:
+          - key: passed
+            valueFrom: input
+            type: Boolean
+            value: "false"
+          iteratorType: byCount
+          block:
+            nodes:
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam: {}
+              id: IteratorStart_izcm
+              name: 循环开始
+              parentId: Iterator_171V
+              width: 320
+              type: IteratorStart
+              x: 32
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam: {}
+              id: IteratorEnd_eYtx
+              name: 迭代结束
+              parentId: Iterator_171V
+              width: 320
+              type: IteratorEnd
+              x: 2262
+              y: 72
+            - config:
+                inputParams: []
+                outputParams:
+                - key: result
+                  type: String
+                  desc: 文本输出
+                  isSystem: true
+                - key: reasoningContent
+                  type: String
+                  desc: 深度思考
+                  isSystem: true
+                nodeParam:
+                  promptContent: "【学生原始需求】\n${sys.query}\n\n【Leader 初步拆解】\n${Start_Y0nM.leader_context}\n\
+                    \n【历史补充】\n${Start_Y0nM.history}\n\n【上次的错误输出（原文）】\n${Script_rtRL.raw}\n\
+                    \n【校验错误信息】\n${Script_rtRL.error_msg}"
+                  sysPromptContent: |-
+                    你是 JSON 修复器。上游需求分析师输出的 JSON 未通过机器校验。
+                    请你根据原始需求和校验错误信息，修正输出内容，重新输出完整的、合法的功能规格 JSON。
+
+                    要求：
+                    1. 只输出 JSON 对象本身，禁止 markdown 围栏和任何解释文字。
+                    2. 保留原输出中合理的内容，只修复错误指出的问题；错误信息未覆盖的字段不要擅自删减。
+                    3. 布尔值使用 true/false，不要写成字符串。
+                    4. 常见错误对照：
+                       - "未找到 JSON 对象/解析失败" → 去掉所有多余文字，只留 JSON
+                       - "xxx 缺失" → 按原始需求合理推测补齐
+                       - "话题没有生产模块" → 【必须补生产者，禁止删字段】
+                         * 若该话题属于模块间话题（由一个模块产生、被另一个模块消费，例如 /obstacle_distance 这类），必须新增一个输出该话题的模块，绝对不要删掉这个输入声明；
+                         * 只有当该话题确属外部传感器/执行器话题（/scan、/cmd_vel、/odom、/imu、/image_raw、/joint_states 等）时，才可把它从 inputs 移除，并在该模块的 function 里写明它是外部话题。
+                    5. Schema 与需求分析师的输出完全相同（schema_version/need_ask/ask_question/project/modules）。
+                    6. 【禁止用删除字段来通过校验】不得为了让校验通过而删除 modules、inputs、outputs 字段或其中任何条目。校验报错指向某个话题时，正确做法是补齐生产者模块或补齐声明，而不是把它删掉。
+                    7. 【自检】每个模块 function/description 里以 / 开头的话题名，都必须能在该模块的 inputs 或 outputs 中找到对应声明；function 写了"订阅"就必须有非空的 inputs。
+                  processCanOutput: false
+                  batchEnable: false
+                  batchSize: 50
+                  concurrentSize: 5
+                  modelConfig:
+                    modelId: qwen3.8-flash
+                    params:
+                      top_p: 0.8
+                      temperature: 0.7
+                      enable_thinking: false
+                      result_format: message
+                    referParams:
+                    - type: String
+                      key: vlImageUrl
+                      desc: 图片地址
+                      valueFrom: refer
+                    - type: String
+                      key: vlVideoUrl
+                      desc: 视频地址
+                      valueFrom: refer
+                    modelName: Qwen3.8-Flash
+                    capabilities:
+                    - TG
+                    - VU
+                    - Reasoning
+                    - VU
+                    - IU
+                  shortMemory:
+                    enabled: false
+                    type: self
+                    round: 3
+                    param:
+                      key: historyList
+                      type: Array<String>
+                      valueFrom: refer
+                      value: "${sys.historyList}"
+                  retryConfig:
+                    retryEnabled: false
+                    maxRetries: 3
+                    retryInterval: 500
+                  tryCatchConfig:
+                    strategy: noop
+                    defaultValues:
+                    - key: result
+                      type: String
+                      desc: 文本输出
+                      isSystem: true
+                  cacheStrategy: disabled
+                  contextSwitch: false
+                  contextParam:
+                    key: historyList
+                    type: Array<String>
+                    valueFrom: refer
+                    value: "${sys.historyList}"
+              id: LLM_lTj3
+              name: 大模型2
+              parentId: Iterator_171V
+              width: 320
+              type: LLM
+              x: 382
+              y: 72
+            - config:
+                inputParams:
+                - key: llm_output
+                  valueFrom: refer
+                  value: "${LLM_lTj3.result}"
+                  type: String
+                outputParams:
+                - key: passed
+                  type: Boolean
+                  desc: 通过结果
+                  properties: []
+                - key: envelope
+                  type: String
+                  desc: ""
+                - key: raw
+                  type: String
+                  desc: ""
+                - key: error_msg
+                  type: String
+                  desc: ""
+                nodeParam:
+                  scriptContent: "import json\nimport re\n\nTOPIC_RE = re.compile(r\"\
+                    (?<![\\w/])/[A-Za-z_][A-Za-z0-9_]*\")\n\n# 外部话题白名单：传感器/执行器等不由本\
+                    项目模块生产的话题\nEXTERNAL_TOPICS = {\n    \"/scan\", \"/cmd_vel\", \"\
+                    /odom\", \"/map\", \"/tf\", \"/tf_static\", \"/clock\",\n    \"\
+                    /image_raw\", \"/camera/image_raw\", \"/imu\", \"/joint_states\"\
+                    \n}\n\n\ndef extract_json(text):\n    \"\"\"从可能带 markdown 围栏或解\
+                    释文字的文本中提取首个 JSON 对象\"\"\"\n    if not text:\n        return None,\
+                    \ \"模型输出为空\"\n    t = text.strip()\n    # 去除 ```json ... ``` 围\
+                    栏\n    if t.startswith(\"```\"):\n        parts = t.split(\"```\"\
+                    )\n        if len(parts) >= 3:\n            t = parts[1]\n   \
+                    \     if t.lstrip()[:4].lower() == \"json\":\n            t =\
+                    \ t.lstrip()[4:]\n    left, right = t.find(\"{\"), t.rfind(\"\
+                    }\")\n    if left == -1 or right == -1 or right <= left:\n   \
+                    \     return None, \"输出中未找到 JSON 对象\"\n    try:\n        return\
+                    \ json.loads(t[left:right + 1]), \"\"\n    except Exception as\
+                    \ e:\n        return None, \"JSON 解析失败: %s\" % str(e)\n\n\ndef\
+                    \ validate(data):\n    \"\"\"结构校验 + 话题闭环检查，返回错误信息列表\"\"\"\n  \
+                    \  errors = []\n    if not isinstance(data, dict):\n        return\
+                    \ [\"根节点必须是 JSON 对象\"]\n\n    # need_ask 必须是布尔值\n    if not isinstance(data.get(\"\
+                    need_ask\"), bool):\n        errors.append(\"need_ask 必须为布尔值 true/false\"\
+                    )\n\n    # 追问场景：只校验 ask_question\n    if data.get(\"need_ask\"\
+                    ) is True:\n        if not str(data.get(\"ask_question\", \"\"\
+                    )).strip():\n            errors.append(\"need_ask=true 时 ask_question\
+                    \ 必填\")\n        return errors\n\n    # 正常场景：project 校验\n    project\
+                    \ = data.get(\"project\")\n    if not isinstance(project, dict):\n\
+                    \        errors.append(\"project 缺失或不是对象\")\n    else:\n     \
+                    \   for field in (\"name_en\", \"name_cn\", \"package_name\",\
+                    \ \"difficulty\", \"description\"):\n            if not str(project.get(field,\
+                    \ \"\")).strip():\n                errors.append(\"project.%s\
+                    \ 缺失\" % field)\n\n    # modules 校验\n    modules = data.get(\"\
+                    modules\")\n    if not isinstance(modules, list) or len(modules)\
+                    \ == 0:\n        errors.append(\"modules 必须为非空数组\")\n        return\
+                    \ errors\n\n    produced = set()\n    for i, module in enumerate(modules):\n\
+                    \        prefix = \"modules[%d]\" % i\n        if not isinstance(module,\
+                    \ dict):\n            errors.append(prefix + \" 必须是对象\")\n   \
+                    \         continue\n        if not str(module.get(\"module_name\"\
+                    , \"\")).strip():\n            errors.append(prefix + \".module_name\
+                    \ 缺失\")\n        if not str(module.get(\"function\", \"\")).strip():\n\
+                    \            errors.append(prefix + \".function 缺失\")\n      \
+                    \  if not isinstance(module.get(\"inputs\"), list):\n        \
+                    \    errors.append(prefix + \".inputs 必须是数组\")\n        if not\
+                    \ isinstance(module.get(\"outputs\"), list):\n            errors.append(prefix\
+                    \ + \".outputs 必须是数组\")\n        for out in module.get(\"outputs\"\
+                    , []):\n            if isinstance(out, dict) and out.get(\"topic\"\
+                    ):\n                produced.add(out[\"topic\"])\n\n    # 话题闭环\
+                    ：内部输入话题必须有生产模块\n    for i, module in enumerate(modules):\n   \
+                    \     if not isinstance(module, dict):\n            continue\n\
+                    \        prefix = \"modules[%d]\" % i\n        name = str(module.get(\"\
+                    module_name\", \"\")).strip() or prefix\n        inputs = module.get(\"\
+                    inputs\", []) or []\n        outputs = module.get(\"outputs\"\
+                    , []) or []\n\n        for inp in inputs:\n            if not\
+                    \ isinstance(inp, dict):\n                continue\n         \
+                    \   topic = inp.get(\"topic\", \"\")\n            if topic and\
+                    \ topic not in produced and topic not in EXTERNAL_TOPICS:\n  \
+                    \              errors.append(\"话题 %s 没有生产模块（且不在外部话题白名单）\" % topic)\n\
+                    \n        # 交叉校验：禁止通过删除字段来通过校验\n        declared = set()\n   \
+                    \     for item in list(inputs) + list(outputs):\n            if\
+                    \ isinstance(item, dict) and item.get(\"topic\"):\n          \
+                    \      declared.add(item[\"topic\"])\n        desc = \"%s %s\"\
+                    \ % (module.get(\"function\", \"\"), module.get(\"description\"\
+                    , \"\"))\n        for topic in sorted(set(TOPIC_RE.findall(desc))):\n\
+                    \            if topic not in declared:\n                errors.append(\n\
+                    \                    \"模块 %s 的 function 提到话题 %s，但 inputs/outputs\
+                    \ 里没有声明（禁止用删除字段的方式通过校验；请补齐该话题的声明，并为模块间话题补齐生产者模块）\"\n         \
+                    \           % (name, topic)\n                )\n        if \"订\
+                    阅\" in str(module.get(\"function\", \"\")) and not inputs:\n \
+                    \           errors.append(\n                \"模块 %s 的 function\
+                    \ 写明「订阅」但 inputs 为空（禁止删除订阅声明来通过校验；请把被订阅话题补回 inputs，并为模块间话题补一个生\
+                    产者模块）\"\n                % name\n            )\n\n    return errors\n\
+                    \n\ndef _pick(name, args, kwargs):\n    \"\"\"从多来源取入参：kwargs >\
+                    \ 位置参数字典 > 模块全局变量（百炼把入参注入为模块级变量）\"\"\"\n    if name in kwargs\
+                    \ and kwargs[name] is not None:\n        return kwargs[name]\n\
+                    \    for a in args:\n        if isinstance(a, dict):\n       \
+                    \     if name in a and not isinstance(a[name], dict):\n      \
+                    \          return a[name]\n            for holder in (\"params\"\
+                    , \"inputs\", \"variables\"):\n                inner = a.get(holder)\n\
+                    \                if isinstance(inner, dict) and name in inner:\n\
+                    \                    return inner[name]\n    g = globals()\n \
+                    \   if name in g:\n        return g[name]\n    if isinstance(g.get(\"\
+                    params\"), dict) and name in g[\"params\"]:\n        return g[\"\
+                    params\"][name]\n    return None\n\n\ndef main(*args, **kwargs):\n\
+                    \    # 百炼脚本节点入口：平台以「无参」调用 main()，入参以模块全局变量注入\n    raw = _pick(\"\
+                    llm_output\", args, kwargs) or \"\"\n    raw = raw if isinstance(raw,\
+                    \ str) else str(raw)\n    raw = raw.strip()\n\n    data, parse_err\
+                    \ = extract_json(raw)\n    error_msg = parse_err\n    if data\
+                    \ is not None:\n        error_list = validate(data)\n        error_msg\
+                    \ = \"；\".join(error_list)\n\n    # 注意：passed 是 Python 布尔值 True/False，\
+                    下游按布尔比较\n    passed = data is not None and error_msg == \"\"\n\
+                    \n    if passed:\n        envelope = json.dumps({\n          \
+                    \  \"valid\": True,\n            \"need_ask\": data.get(\"need_ask\"\
+                    , False),\n            \"ask_question\": data.get(\"ask_question\"\
+                    , \"\"),\n            \"data\": data\n        }, ensure_ascii=False)\n\
+                    \    else:\n        # 修复 1 次后仍失败：降级信封，Leader 据此改走原文透传/提示重试\n \
+                    \       envelope = json.dumps({\n            \"valid\": False,\n\
+                    \            \"need_ask\": False,\n            \"ask_question\"\
+                    : \"\",\n            \"data\": None,\n            \"raw\": raw,\n\
+                    \            \"error_msg\": error_msg\n        }, ensure_ascii=False)\n\
+                    \n    return {\n        \"passed\": passed,\n        \"envelope\"\
+                    : envelope,\n        \"raw\": raw,\n        \"error_msg\": error_msg\n\
+                    \    }"
+                  scriptType: python
+                  retryConfig:
+                    retryEnabled: false
+                    maxRetries: 3
+                    retryInterval: 500
+                  tryCatchConfig:
+                    strategy: noop
+              id: Script_vhge
+              name: 脚本2
+              parentId: Iterator_171V
+              width: 320
+              type: Script
+              x: 852
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam:
+                  inputs:
+                  - id: gtay
+                    left:
+                      valueFrom: refer
+                      value: "${Iterator_171V.passed}"
+                      type: Boolean
+                    right:
+                      valueFrom: refer
+                      value: "${Script_vhge.passed}"
+                      type: Boolean
+              id: Variable_HMjn
+              name: 变量赋值1
+              parentId: Iterator_171V
+              width: 320
+              type: Variable
+              x: 1322
+              y: 72
+            - config:
+                inputParams: []
+                outputParams: []
+                nodeParam:
+                  output: "${Script_vhge.envelope}"
+                  streamSwitch: true
+              id: Output_uSTs
+              name: 流程输出3
+              parentId: Iterator_171V
+              width: 320
+              type: Output
+              x: 1792
+              y: 72
+            edges:
+            - zIndex: 1002
+              id: IteratorStart_izcm-IteratorStart_izcm-LLM_lTj3-LLM_lTj3
+              source: IteratorStart_izcm
+              target: LLM_lTj3
+              sourceHandle: IteratorStart_izcm
+              targetHandle: LLM_lTj3
+              type: default
+            - zIndex: 1002
+              id: LLM_lTj3-LLM_lTj3-Script_vhge-Script_vhge
+              source: LLM_lTj3
+              target: Script_vhge
+              sourceHandle: LLM_lTj3
+              targetHandle: Script_vhge
+              type: default
+            - zIndex: 1002
+              id: Script_vhge-Script_vhge-Variable_HMjn-Variable_HMjn
+              source: Script_vhge
+              target: Variable_HMjn
+              sourceHandle: Script_vhge
+              targetHandle: Variable_HMjn
+              type: default
+            - zIndex: 1002
+              id: Variable_HMjn-Variable_HMjn-Output_uSTs-Output_uSTs
+              source: Variable_HMjn
+              target: Output_uSTs
+              sourceHandle: Variable_HMjn
+              targetHandle: Output_uSTs
+              type: default
+            - zIndex: 1002
+              id: Output_uSTs-Output_uSTs-IteratorEnd_eYtx-IteratorEnd_eYtx
+              source: Output_uSTs
+              target: IteratorEnd_eYtx
+              sourceHandle: Output_uSTs
+              targetHandle: IteratorEnd_eYtx
+              type: default
+          terminations: []
+    - id: Script_Ijod
+      type: Script
+      name: 脚本3
+      x: 5034
+      y: 188
+      config:
+        inputParams:
+        - key: input1
+          type: String
+          value: "${Script_rtRL.envelope}"
+          valueFrom: refer
+        - key: input2
+          type: Array<String>
+          value: "${Iterator_171V.envelope}"
+          valueFrom: refer
+        outputParams:
+        - key: envelope
+          type: String
+          desc: 输出结果
+          properties: []
+        nodeParam:
+          scriptContent: "import json\n\n\ndef _pick(name, args, kwargs):\n    \"\"\
+            \"取入参：平台标准 params 字典 > kwargs > 位置参数字典 > 模块全局变量\"\"\"\n    p = globals().get(\"\
+            params\")\n    if isinstance(p, dict) and name in p:\n        return p[name]\n\
+            \    if name in kwargs and kwargs[name] is not None:\n        return kwargs[name]\n\
+            \    for a in args:\n        if isinstance(a, dict):\n            if name\
+            \ in a and not isinstance(a[name], dict):\n                return a[name]\n\
+            \            for holder in (\"params\", \"inputs\", \"variables\"):\n\
+            \                inner = a.get(holder)\n                if isinstance(inner,\
+            \ dict) and name in inner:\n                    return inner[name]\n \
+            \   g = globals()\n    if name in g:\n        return g[name]\n    return\
+            \ None\n\n\ndef _flatten(v):\n    \"\"\"归一成候选字符串列表（兼容 Array<String> /\
+            \ None / 字面量 null）\"\"\"\n    out = []\n    if v is None:\n        return\
+            \ out\n    if isinstance(v, str):\n        out.append(v)\n        return\
+            \ out\n    if isinstance(v, (list, tuple)):\n        for item in v:\n\
+            \            out.extend(_flatten(item))\n        return out\n    if isinstance(v,\
+            \ dict):\n        out.append(json.dumps(v, ensure_ascii=False))\n    \
+            \    return out\n    out.append(str(v))\n    return out\n\n\ndef _first_envelope(cands):\n\
+            \    \"\"\"取第一个能解析成「含 valid 字段对象」的候选；数组则取其中第一个信封\"\"\"\n    for c in cands:\n\
+            \        s = (c or \"\").strip()\n        if not s or s == \"null\":\n\
+            \            continue\n        try:\n            obj = json.loads(s)\n\
+            \        except Exception:\n            continue\n        if isinstance(obj,\
+            \ dict) and \"valid\" in obj:\n            return json.dumps(obj, ensure_ascii=False)\n\
+            \        if isinstance(obj, list):\n            for item in obj:\n   \
+            \             if isinstance(item, dict) and \"valid\" in item:\n     \
+            \               return json.dumps(item, ensure_ascii=False)\n    return\
+            \ \"\"\n\n\ndef main(*args, **kwargs):\n    # 两个互斥分支在此归并：正常分支给 input1，\
+            修复分支给 input2\n    # 未执行的分支平台渲染成字面量 \"null\"，由 _first_envelope 跳过\n   \
+            \ cands = _flatten(_pick(\"input1\", args, kwargs)) + _flatten(_pick(\"\
+            input2\", args, kwargs))\n    envelope = _first_envelope(cands)\n    return\
+            \ {\"envelope\": envelope, \"ok\": bool(envelope)}"
+          tryCatchConfig:
+            strategy: noop
+          retryConfig:
+            retryEnabled: false
+            maxRetries: 3
+            retryInterval: 500
+          scriptType: python
+    - id: Output_WRy3
+      type: Output
+      name: 流程输出2
+      x: 5504
+      y: 188
+      config:
+        inputParams: []
+        outputParams: []
+        nodeParam:
+          output: "${Script_Ijod.envelope}"
+          streamSwitch: true
+  globalConfig:
+    historyConfig:
+      historySwitch: true
+      historyMaxRound: 5
+    historyMaxRound: 5

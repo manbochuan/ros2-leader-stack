@@ -1,0 +1,364 @@
+========================================================
+ ②③ 工作流的输入输出规范（给同学）· v2 修正版
+========================================================
+
+ ★ v2 修正：PLAN_JSON / NODE_LIST 的【字段名】按 Leader 代码实际读的改了
+   （v1 里的 name/publishes/subscribes/topics/packages/files 都是错的）
+
+ 背景：
+   百炼主 agent → 本项目编排服务（Leader）→ 逐个调你们的工作流
+   Leader 是【代码】在解析你们的输出，字段名必须严格对上。
+
+ 三个工作流的分工：
+   ① 需求分析   ✅ 已完成（输出已验证，格式完全正确）
+   ② 项目规划   ⏳ 待完成
+   ③ 代码生成   ⏳ 待完成
+
+
+========================================================
+ 零、先说 Leader 刚修的一个 bug（对你们有利）
+========================================================
+
+  原来 Leader 调 ②③ 时，input.prompt 里放的是一句占位文字：
+     "（本请求为结构化输入，参数见自定义变量）"
+
+  现已修复：真正的 JSON 现在会直接放进 input.prompt。
+
+  → 所以你们【从 prompt / 用户输入 里读 JSON】现在是可行的。
+
+
+========================================================
+ 一、② 项目规划
+========================================================
+
+【Leader 传给 ② 的输入】
+
+   放在 input.prompt 里（App Completion API 唯一可靠的通道），
+   同时在 input.biz_params 里放一份备份。
+
+   prompt 里的内容 = ① 输出的 data 字段那一坨 JSON，形如：
+
+   {"schema_version":"1.0",
+    "project":{"name_en":"obstacle_avoidance","name_cn":"避障小车",
+               "package_name":"obstacle_avoidance","difficulty":"入门",
+               "description":"激光雷达检测障碍物距离并自动避障的两轮差速小车"},
+    "modules":[
+      {"module_name":"obstacle_detector",
+       "function":"订阅激光雷达 /scan，计算最近障碍物距离并发布",
+       "inputs":[{"topic":"/scan","message_type":"sensor_msgs/msg/LaserScan","description":"..."}],
+       "outputs":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32","description":"..."}],
+       "dependencies":["rclpy","sensor_msgs","std_msgs"]},
+      {"module_name":"motion_controller", "function":"...", "inputs":[...], "outputs":[...], "dependencies":[...]}
+    ]}
+
+   ★ 提示词/代码里请【从用户输入 / sys.query / prompt】读这段 JSON，
+     宽容处理（字段缺失也不报错）。
+   ★ 不要依赖"开始节点的自定义变量"（百炼 API 传不进去，我们试过 4 种形态）。
+
+
+【② 必须输出的格式 —— 三段，顺序不能变】
+
+   第 1 段：学习指南（纯 Markdown 文本，给学生看的）
+   第 2 段：NODE_LIST 标记段
+   第 3 段：PLAN_JSON 标记段
+
+   具体长这样：
+
+   ## 📚 项目学习指南
+
+   ### 项目介绍
+   ……
+
+   <!--NODE_LIST_START-->
+   {"nodes":[ …… 见下 …… ]}
+   <!--NODE_LIST_END-->
+
+   <!--PLAN_JSON_START-->
+   {"plan":{ …… 见下 …… }}
+   <!--PLAN_JSON_END-->
+
+
+【第 2 段 · NODE_LIST 的 JSON 结构（★ 字段名严格按这个）】
+
+   {
+     "nodes": [
+       {
+         "node_name":        "obstacle_detector_node",
+         "function":         "订阅 /scan，计算最近障碍物距离并发布",
+         "publish_topics": [
+           {"topic": "/obstacle_distance", "message_type": "std_msgs/msg/Float32"}
+         ],
+         "subscribe_topics": [
+           {"topic": "/scan", "message_type": "sensor_msgs/msg/LaserScan"}
+         ],
+         "core_logic":       "定时器每 100ms 读一次 LaserScan，取 ranges 最小值发布"
+       },
+       {
+         "node_name":        "motion_controller_node",
+         "function":         "订阅障碍物距离，低于阈值时减速转向，发布速度指令",
+         "publish_topics": [
+           {"topic": "/cmd_vel", "message_type": "geometry_msgs/msg/Twist"}
+         ],
+         "subscribe_topics": [
+           {"topic": "/obstacle_distance", "message_type": "std_msgs/msg/Float32"}
+         ],
+         "core_logic":       "距离 < 0.5m 时把线速度降为 0 并原地转向"
+       }
+     ]
+   }
+
+   ★ 字段名必须是：node_name / function / publish_topics / subscribe_topics / core_logic
+     （不是 name / publishes / subscribes —— Leader 读的是前者）
+
+   ★ Leader 会把这个 node 对象【原样】传给 ③（所以 ③ 收到的也是这些字段名）
+
+   ★ nodes 不能是空数组（否则 Leader 报"没有 NODE_LIST 标记"）
+
+
+【第 3 段 · PLAN_JSON 的 JSON 结构（★ 字段名严格按这个）】
+
+   Leader 用它渲染"规划书"（Markdown 表格）。字段名必须一致：
+
+   {
+     "plan": {
+       "project": {
+         "name_cn":      "避障小车",
+         "name_en":      "obstacle_avoidance",
+         "package_name": "obstacle_avoidance",
+         "difficulty":   "入门",
+         "description":  "激光雷达检测障碍物距离并自动避障的两轮差速小车"
+       },
+       "nodes": [
+         {
+           "node_name": "obstacle_detector_node",
+           "function":  "订阅 /scan，计算最近障碍物距离并发布",
+           "publish_topics":   [{"topic": "/obstacle_distance", "message_type": "std_msgs/msg/Float32"}],
+           "subscribe_topics": [{"topic": "/scan", "message_type": "sensor_msgs/msg/LaserScan"}],
+           "core_logic": "定时器每 100ms 读一次 LaserScan"
+         },
+         {
+           "node_name": "motion_controller_node",
+           "function":  "订阅障碍物距离，低于阈值时减速转向",
+           "publish_topics":   [{"topic": "/cmd_vel", "message_type": "geometry_msgs/msg/Twist"}],
+           "subscribe_topics": [{"topic": "/obstacle_distance", "message_type": "std_msgs/msg/Float32"}],
+           "core_logic": "距离 < 0.5m 时降速转向"
+         }
+       ],
+       "topic_overview": [
+         {"topic": "/scan", "message_type": "sensor_msgs/msg/LaserScan",
+          "publisher": "外部雷达", "subscriber": "obstacle_detector_node",
+          "purpose": "提供激光雷达原始扫描数据"},
+         {"topic": "/obstacle_distance", "message_type": "std_msgs/msg/Float32",
+          "publisher": "obstacle_detector_node", "subscriber": "motion_controller_node",
+          "purpose": "传递最近障碍物距离"},
+         {"topic": "/cmd_vel", "message_type": "geometry_msgs/msg/Twist",
+          "publisher": "motion_controller_node", "subscriber": "底盘",
+          "purpose": "控制小车运动"}
+       ],
+       "dependencies": ["rclpy", "sensor_msgs", "std_msgs", "geometry_msgs"],
+       "file_structure": [
+         "obstacle_avoidance/",
+         "  obstacle_avoidance/",
+         "    __init__.py",
+         "    obstacle_detector_node.py",
+         "    motion_controller_node.py",
+         "  launch/",
+         "    project_launch.py",
+         "  package.xml",
+         "  setup.py",
+         "  setup.cfg"
+       ]
+     }
+   }
+
+   ★ 字段名必须是：
+       project.{name_cn,name_en,package_name,difficulty,description}
+       nodes[].{node_name,function,publish_topics,subscribe_topics,core_logic}
+       topic_overview[].{topic,message_type,publisher,subscriber,purpose}
+       dependencies（数组）
+       file_structure（字符串数组，可以带缩进表示层级）
+     （不是 topics / packages / files —— Leader 读的是前者）
+
+
+【② 输出的完整示例（可以直接照这个改）】
+
+## 📚 项目学习指南
+
+### 项目介绍
+本项目实现一个基于激光雷达的避障小车……
+
+### 系统架构
+雷达 → /scan → obstacle_detector_node → /obstacle_distance → motion_controller_node → /cmd_vel → 底盘
+
+### 涉及的知识点
+- 话题发布/订阅：节点之间通过话题传递数据……
+- sensor_msgs/msg/LaserScan：激光雷达扫描数据的标准消息类型……
+
+### 新手易错点
+1. 忘记在 setup.py 的 entry_points 里注册节点
+   现象：ros2 run 找不到可执行文件
+   原因：……
+   解决：……
+
+### 运行步骤
+1. colcon build --packages-select obstacle_avoidance
+2. source install/setup.bash
+3. ros2 run obstacle_avoidance obstacle_detector_node
+
+### 进一步学习建议
+……
+
+<!--NODE_LIST_START-->
+{"nodes":[{"node_name":"obstacle_detector_node","function":"订阅 /scan，计算最近障碍物距离并发布","publish_topics":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32"}],"subscribe_topics":[{"topic":"/scan","message_type":"sensor_msgs/msg/LaserScan"}],"core_logic":"定时器每 100ms 读一次 LaserScan，取 ranges 最小值发布"},{"node_name":"motion_controller_node","function":"订阅障碍物距离，低于阈值时减速转向，发布速度指令","publish_topics":[{"topic":"/cmd_vel","message_type":"geometry_msgs/msg/Twist"}],"subscribe_topics":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32"}],"core_logic":"距离 < 0.5m 时把线速度降为 0 并原地转向"}]}
+<!--NODE_LIST_END-->
+
+<!--PLAN_JSON_START-->
+{"plan":{"project":{"name_cn":"避障小车","name_en":"obstacle_avoidance","package_name":"obstacle_avoidance","difficulty":"入门","description":"激光雷达检测障碍物距离并自动避障的两轮差速小车"},"nodes":[{"node_name":"obstacle_detector_node","function":"订阅 /scan，计算最近障碍物距离并发布","publish_topics":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32"}],"subscribe_topics":[{"topic":"/scan","message_type":"sensor_msgs/msg/LaserScan"}],"core_logic":"定时器每 100ms 读一次 LaserScan"},{"node_name":"motion_controller_node","function":"订阅障碍物距离，低于阈值时减速转向","publish_topics":[{"topic":"/cmd_vel","message_type":"geometry_msgs/msg/Twist"}],"subscribe_topics":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32"}],"core_logic":"距离 < 0.5m 时降速转向"}],"topic_overview":[{"topic":"/scan","message_type":"sensor_msgs/msg/LaserScan","publisher":"外部雷达","subscriber":"obstacle_detector_node","purpose":"提供激光雷达原始扫描数据"},{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32","publisher":"obstacle_detector_node","subscriber":"motion_controller_node","purpose":"传递最近障碍物距离"},{"topic":"/cmd_vel","message_type":"geometry_msgs/msg/Twist","publisher":"motion_controller_node","subscriber":"底盘","purpose":"控制小车运动"}],"dependencies":["rclpy","sensor_msgs","std_msgs","geometry_msgs"],"file_structure":["obstacle_avoidance/","  obstacle_avoidance/","    __init__.py","    obstacle_detector_node.py","    motion_controller_node.py","  launch/","    project_launch.py","  package.xml","  setup.py","  setup.cfg"]}}
+<!--PLAN_JSON_END-->
+
+
+【★ 三个硬性要求】
+
+  1. 两个标记段必须【原样】出现（大小写、下划线都不能变）：
+        <!--NODE_LIST_START-->   <!--NODE_LIST_END-->
+        <!--PLAN_JSON_START-->  <!--PLAN_JSON_END-->
+
+  2. 标记段里的内容必须是【合法 JSON】
+     （可以包在 ```json 代码块里，Leader 会自动剥掉围栏）
+
+  3. JSON 里不能有注释、不能有中文标点、不能有尾逗号
+
+
+========================================================
+ 二、③ 代码生成
+========================================================
+
+【Leader 传给 ③ 的输入】
+
+   一次只给【一个节点】的规格。内容 = NODE_LIST 里的一个 node 对象，原样传：
+
+   {"node_name":"obstacle_detector_node",
+    "function":"订阅 /scan，计算最近障碍物距离并发布",
+    "publish_topics":[{"topic":"/obstacle_distance","message_type":"std_msgs/msg/Float32"}],
+    "subscribe_topics":[{"topic":"/scan","message_type":"sensor_msgs/msg/LaserScan"}],
+    "core_logic":"定时器每 100ms 读一次 LaserScan"}
+
+   ★ 同样从 prompt / 用户输入 里读
+
+
+【③ 必须输出的格式】
+
+   <!--ENV_START-->
+   {
+     "valid": true,
+     "node_name": "obstacle_detector_node",
+     "file_name": "obstacle_detector_node.py",
+     "code": "import rclpy\nfrom rclpy.node import Node\n\n...",
+     "summary": "一句话说明这个节点干什么",
+     "teaching": "教学说明：涉及的知识点、新手易错点、运行方式"
+   }
+   <!--ENV_END-->
+
+   失败时：
+
+   <!--ENV_START-->
+   {"valid": false, "node_name": "obstacle_detector_node", "error": "具体原因"}
+   <!--ENV_END-->
+
+
+【字段说明】
+
+   valid     : bool   —— 是否成功（必填）
+   code      : string —— 完整、可直接运行的 Python 代码（必填，含 import / 类 / main）
+   file_name : string —— 文件名（建议填；不填 Leader 会用 node_name.py）
+   summary   : string —— 一句话功能说明（建议填）
+   teaching  : string —— 教学说明：知识点 + 易错点 + 运行方式（建议填）
+   node_name : string —— 节点名（建议填；不填 Leader 会用请求里的名字补上）
+   error     : string —— 失败原因（valid=false 时填）
+
+   ★ code 里的换行要用 \n 转义（因为整个信封是 JSON）
+   ★ 只有 ENV 标记段里的内容会被读，标记段外的文字随便写
+
+
+========================================================
+ 三、常见错误对照表
+========================================================
+
+ 现象                                      原因
+ ──────────────────────────────────────────────────────────────────
+ Leader 报"② 输出里没有 NODE_LIST 标记"     标记段名字写错 / 没输出
+                                            / JSON 不合法 / nodes 为空数组
+
+ Leader 报"② 标记段解析失败"                标记段里的 JSON 不合法
+                                            （注释 / 中文标点 / 尾逗号）
+
+ Leader 报"③ 输出里没有 ENV 标记"           ENV 标记写错 / 没输出
+
+ Leader 报"③ 信封不是合法 JSON"             ENV 里的 JSON 不合法
+
+ ② 输出的是"模板文字"（全是 xxx）            输入没读到（见第四节）
+
+ 规划书里节点名显示"—"                       用了 name 而不是 node_name
+
+ 规划书里话题表格是空的                      用了 topics 而不是 topic_overview
+
+
+========================================================
+ 四、输入读不到怎么办（重要）
+========================================================
+
+   Leader 调百炼工作流用的是 App Completion API，
+   官方只保证 input.prompt 能可靠送达。
+
+   所以工作流里读输入时，请优先从【用户输入 / prompt / sys.query】读，例如：
+     · 百炼工作流开始节点的「用户输入」变量
+     · 或者用「代码节点」从 sys.query 里取
+
+   ★ 不要依赖"开始节点的自定义变量"（实测传不进去）
+     （Leader 也会同时在 input.biz_params 里放一份备份，但那条路未验证可靠）
+
+   ★ 建议写成"宽容读取"：
+       先试自定义变量 → 有值就用
+       → 没值就从 prompt / query 里解析 JSON
+
+
+========================================================
+ 五、自测方法（不用连 Leader）
+========================================================
+
+ KEY=$(grep '^DASHSCOPE_API_KEY=' /opt/acps-agent/leader/.env | cut -d= -f2)
+
+ # 测 ②
+ curl -s --max-time 180 -X POST \
+   "https://dashscope.aliyuncs.com/api/v1/apps/your-bailian-app-id/completion" \
+   -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
+   -d '{"input":{"prompt":"{\"project\":{\"name_cn\":\"避障小车\"},\"modules\":[{\"module_name\":\"obstacle_detector\",\"function\":\"订阅激光雷达\"}]}"},"parameters":{}}' \
+   | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['output']['text'])"
+
+ # 测 ③
+ curl -s --max-time 180 -X POST \
+   "https://dashscope.aliyuncs.com/api/v1/apps/your-bailian-app-id/completion" \
+   -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
+   -d '{"input":{"prompt":"{\"node_name\":\"hello_publisher_node\",\"function\":\"发布 hello 字符串\",\"publish_topics\":[{\"topic\":\"/chatter\",\"message_type\":\"std_msgs/msg/String\"}]}"},"parameters":{}}' \
+   | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['output']['text'])"
+
+ ★ 输出里能看到对应标记段 = 格式对了
+ ★ 现在 ② 输出的是 887 字符的 xxx 模板 → 说明输入没读到，要按第四节改
+
+
+========================================================
+ 六、一句话总结
+========================================================
+
+   ② 输出三段：学习指南 + NODE_LIST 标记段 + PLAN_JSON 标记段
+      NODE_LIST 里每个节点用：node_name / function / publish_topics /
+                              subscribe_topics / core_logic
+      PLAN_JSON 用：project / nodes / topic_overview / dependencies / file_structure
+
+   ③ 输出一个 ENV 标记段：
+      {"valid","code","file_name","summary","teaching","node_name"}
+
+   输入从 prompt / 用户输入 里读，别依赖自定义变量
+   ① 已经做好了，照它的风格写就行
+
+========================================================
